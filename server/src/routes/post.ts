@@ -8,6 +8,6 @@ router.post("/create", authMiddleware, uploadPostImg, createPost);
 router.get("/:postId", authMiddleware, getPost);
 router.put("/:postId", authMiddleware, updatePost);
 router.delete("/:postId", authMiddleware, deletePost);
-router.get("/all", authMiddleware, getAllPosts);
+router.get("/", authMiddleware, getAllPosts);
 
 export default router;

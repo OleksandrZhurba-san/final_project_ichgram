@@ -3,6 +3,7 @@ import { ICreatePostBody, IPostParams, IUpdatePostBody } from "../types/post";
 import { IApiResponse } from "../types/common";
 import { Post, User } from "../models"
 import upload from "../utils/multer";
+import mongoose, { mongo } from "mongoose";
 
 export const uploadPostImg = upload.single("images");
 
@@ -12,8 +13,6 @@ const createPost = async (
 ): Promise<void> => {
   const { description } = req.body;
   const userId = req.user._id;
-  console.log(req.file);
-  console.log(req.body);
   try {
     if (!req.file) {
       res.status(400).json({ message: "Image is required" });
@@ -80,13 +79,11 @@ const updatePost = async (
     const post = await Post.findById(postId);
 
     if (!post) {
-      console.log(`post not found: post ${post}`);
       res.status(404).json({ message: "Post not found" });
       return;
     }
 
     if (String(post.user_id) !== String(userId)) {
-      console.log(post.user_id, userId);
       res.status(403).json({ message: "Access denied!" });
       return;
     }
@@ -148,9 +145,22 @@ const getAllPosts = async (
   req: Request,
   res: Response<IApiResponse>
 ): Promise<void> => {
+  if (!mongoose.isValidObjectId(req.user._id)) {
+    res.status(400).json({ message: "Invalid user ID" });
+    return;
+  }
   const userId = req.user._id;
+  if (!req.user || !req.user._id) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   try {
-    const posts = await Post.find({ user_id: { $ne: userId } })
+    console.log(userId, typeof userId);
+
+    //const test = await Post.find({ user_id: {$ne: userId} })
+    //TODO: weird behavior, compass does work with $ne code base w\o 
+    const posts = await Post.find({ user_id: userId })
       .populate("user_id", "username image")
       .populate({
         path: "comments",
@@ -159,7 +169,7 @@ const getAllPosts = async (
           select: "username image",
         },
       })
-      .populate("likes");
+      .populate("likes", "user_id");
     res.status(200).json({ message: "Posts", data: posts });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });

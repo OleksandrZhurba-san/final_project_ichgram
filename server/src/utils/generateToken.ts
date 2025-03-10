@@ -10,5 +10,5 @@ if (!JWT_SECRET) {
 }
 
 export const generateToken = (payload: ITokenPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h"});
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 };

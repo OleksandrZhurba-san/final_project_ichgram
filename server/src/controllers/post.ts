@@ -67,6 +67,7 @@ const getPost = async (
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 const updatePost = async (
   req: Request<IPostParams, {}, IUpdatePostBody>,
   res: Response<IApiResponse>
@@ -90,10 +91,13 @@ const updatePost = async (
       return;
     }
 
-    if (description) {
-      post.description = description;
+    if (!description) {
+      res.status(401).json({ message: "No description for update provided" });
+      return;
     }
 
+    console.log("Description to update: ", description);
+    post.description = description;
     await post.save();
 
     res

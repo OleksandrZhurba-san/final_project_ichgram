@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { ICreatePostBody, IPostParams, IUpdatePostBody } from "../types/post";
 import { IApiResponse } from "../types/common";
-import Post from "../models/Post";
-import User from "../models/User";
+import { Post, User } from "../models"
 import upload from "../utils/multer";
 
 export const uploadPostImg = upload.single("images");

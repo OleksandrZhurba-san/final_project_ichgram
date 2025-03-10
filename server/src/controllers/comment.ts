@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { ICommentParams, ICreateCommentBody } from "../types/comment";
 import { IApiResponse } from "../types/common";
-import Post from "../models/Post";
-import Comment from "../models/Comment";
+import { Post, Comment } from "../models";
 
 const createComment = async (
   req: Request<ICommentParams, {}, ICreateCommentBody>,

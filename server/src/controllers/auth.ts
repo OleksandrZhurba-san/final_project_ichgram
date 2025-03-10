@@ -2,11 +2,10 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { IApiResponse } from "../types/common";
 import { ILoginBody, IRegisterBody } from "../types/auth";
-import User from "../models/User";
+import { User } from "../models";
 // import { generateToken } from "../utils/generateToken";
 import jwt, { Secret } from "jsonwebtoken";
 import { IUser } from "../types/user";
-import { log } from "console";
 
 const register = async (
   req: Request<{}, {}, IRegisterBody>,

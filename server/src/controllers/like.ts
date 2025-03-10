@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { IApiResponse } from "../types/common";
-import Post from "../models/Post";
-import Like from "../models/Like";
+import { Post, Like } from "../models"
 
 const likePost = async (
   req: Request,
@@ -45,7 +44,7 @@ const likePost = async (
       { new: true }
     );
 
-    res.status(201).json({ message: "Like post successfully", data: like });
+    res.status(201).json({ message: "Liked post successfully", data: like });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" })

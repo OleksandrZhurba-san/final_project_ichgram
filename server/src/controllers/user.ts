@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { IApiResponse } from "../types/common";
-import User from "../models/User";
+import { User } from "../models";
 
 const getUserProfile = async (
   req: Request,

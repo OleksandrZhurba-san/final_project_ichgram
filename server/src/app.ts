@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import "module-alias/register"
 import connectDb from "./config/db";
 import { authRoutes, userRoutes, postRoutes, commentRoutes, likeRoutes } from "./routes";
 const app = express();

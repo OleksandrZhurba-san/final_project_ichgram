@@ -12,8 +12,7 @@ const connectDb = async (): Promise<void> => {
     console.log("Connected to DB");
   } catch (error: unknown) {
     console.error("Error while connecting to DB", error);
-    process.exit(1);
   }
-}
+};
 
 export default connectDb;

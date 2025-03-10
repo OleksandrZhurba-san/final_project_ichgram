@@ -70,10 +70,13 @@ http://localhost:3000/api
 📌 **Response:**
 ```json
 {
-    "message": "Comment added successfully",
-    "comment": {
-        "id": "987654321",
-        "text": "first comment to first post POG"
+    "message": "Comment has been created successfully",
+    "data": {
+        "user_id": "67ccf85e76721c8a786397de",
+        "ref_id": "67ce140883a9fac734148e65",
+        "ref_type": "Post",
+        "_id": "67cf4246e0728fe8a9e51dbb",
+        "__v": 0
     }
 }
 ```
@@ -84,7 +87,7 @@ http://localhost:3000/api
 📌 **Response:**
 ```json
 {
-    "message": "Comment deleted successfully"
+    "message": "The comment has been successfully deleted."
 }
 ```
 

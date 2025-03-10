@@ -16,3 +16,8 @@ export interface IUser extends Document {
   following: Types.ObjectId[];
   create_at: Date;
 }
+export interface IUpdateProfileBody {
+  username: string;
+  bio: string;
+  website: string;
+}

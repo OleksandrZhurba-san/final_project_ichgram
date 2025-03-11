@@ -158,9 +158,7 @@ const getAllPosts = async (
   try {
     console.log(userId, typeof userId);
 
-    //const test = await Post.find({ user_id: {$ne: userId} })
-    //TODO: weird behavior, compass does work with $ne code base w\o 
-    const posts = await Post.find({ user_id: userId })
+    const posts = await Post.find({ user_id: { $ne: userId } })
       .populate("user_id", "username image")
       .populate({
         path: "comments",

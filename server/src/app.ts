@@ -3,8 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import "module-alias/register"
 import connectDb from "./config/db";
-import { authRoutes, userRoutes, postRoutes, commentRoutes, likeRoutes } from "./routes";
-import exp from "constants";
+import { authRoutes, userRoutes, postRoutes, commentRoutes, likeRoutes, followRoutes } from "./routes";
 const app = express();
 const PORT = process.env.PORT || 3333;
 
@@ -21,6 +20,7 @@ apiRouter.use("/user", userRoutes);
 apiRouter.use("/post", postRoutes);
 apiRouter.use("/comment", commentRoutes);
 apiRouter.use("/like", likeRoutes);
+apiRouter.use("/follow", followRoutes);
 
 app.use("/api", apiRouter);
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getUserProfile, updateUserProfile } from "../controllers/user";
+import { getUserProfile, updateUserProfile, updateUserProfilePicture } from "../controllers/user";
 import authMiddleware from "../middlewares/authMiddleware";
+import validateObjectId from "../middlewares/validateId";
 
 const router: Router = Router();
 
-router.get("/:id", authMiddleware, getUserProfile);
-router.put("/update", authMiddleware, updateUserProfile);
+router.get("/:id", authMiddleware, validateObjectId("id"), getUserProfile);
+router.put("/update", authMiddleware, updateUserProfilePicture, updateUserProfile);
 
 export default router;

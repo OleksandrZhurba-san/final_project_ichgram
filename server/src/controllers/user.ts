@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { IApiResponse } from "../types/common";
-import { Post, User } from "../models";
-import { IUpdatePostBody } from "../types/post";
+import { User } from "../models";
 import { IUpdateProfileBody } from "../types/user";
+import upload from "../utils/multer";
 
 const getUserProfile = async (
   req: Request,
@@ -13,6 +13,7 @@ const getUserProfile = async (
     const user = await User.findById(userId)
       .select(["-password"])
       .populate("posts");
+
     if (!user) {
       console.log(`User not found ${user}`);
       res.status(404).json({ message: "User not found" });
@@ -33,7 +34,6 @@ const updateUserProfile = async (
   const user = req.user;
 
   try {
-
     if (!user) {
       console.log(user);
       res.status(401).json({ message: "Unautharized access" });
@@ -44,9 +44,11 @@ const updateUserProfile = async (
     if (bio) {
       user.bio = bio;
     }
+
     if (website) {
       user.website = website;
     }
+
     if (username) {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -70,4 +72,6 @@ const updateUserProfile = async (
 
 }
 
-export { getUserProfile, updateUserProfile };
+const updateUserProfilePicture = upload.single("image");
+
+export { getUserProfile, updateUserProfile, updateUserProfilePicture };

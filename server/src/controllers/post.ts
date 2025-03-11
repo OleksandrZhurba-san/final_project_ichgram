@@ -3,9 +3,9 @@ import { ICreatePostBody, IPostParams, IUpdatePostBody } from "../types/post";
 import { IApiResponse } from "../types/common";
 import { Post, User } from "../models"
 import upload from "../utils/multer";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
-export const uploadPostImg = upload.single("images");
+export const uploadPostImg = upload.single("image");
 
 const createPost = async (
   req: Request<{}, {}, ICreatePostBody>,

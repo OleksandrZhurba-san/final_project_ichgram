@@ -1,8 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loginUserService, registerUserService } from "../../api/authApi";
+import { jwtDecode } from "jwt-decode";
 
 const initialState = {
-  user: null,
+  user: localStorage.getItem("token")
+    ? jwtDecode(localStorage.getItem("token"))
+    : null,
   token: localStorage.getItem("token") || null,
   isLoading: false,
   isError: false,
@@ -59,7 +62,6 @@ const authSlice = createSlice({
         state.isSuccess = false;
         state.isError = true;
         state.message = action.payload;
-        console.log(action.payload);
       })
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
@@ -83,5 +85,6 @@ const authSlice = createSlice({
 });
 
 export const { logout } = authSlice.actions;
+export const selectUser = (state) => state.auth.user;
 
 export default authSlice.reducer;

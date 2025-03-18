@@ -48,6 +48,7 @@ const SignUp = () => {
         Sign up to see photos and videos from your friends.
       </Typography>
 
+      {/*TODO: move to component*/}
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
           label="Email"

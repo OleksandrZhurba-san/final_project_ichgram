@@ -21,9 +21,7 @@ const Login = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token, isLoading, isError, message } = useSelector(
-    (state) => state.auth
-  );
+  const { isLoading, isError, message } = useSelector((state) => state.auth);
 
   const {
     register,

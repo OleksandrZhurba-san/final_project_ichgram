@@ -172,16 +172,16 @@ http://localhost:3000/api
 npm install
 ```
 
-2️⃣ Start the server:
+2️⃣ Start the  dev server:
 ```sh
-npm start
+npm run dev
 ```
 
 ---
 
 ## 📌 Notes
 - All authenticated routes require a valid **JWT Token** in the `Authorization` header.
-- Replace `localhost:5000/api` with the actual server URL in production.
+- Replace `localhost:3000/api` with the actual server URL in production.
 
 📌 **Happy Coding! 🚀**
 

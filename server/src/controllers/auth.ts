@@ -12,7 +12,7 @@ const register = async (
   res: Response<IApiResponse>
 ): Promise<void> => {
   try {
-    const { full_name, username, email, password } = req.body;
+    const { full_name, email, username, password } = req.body;
     if (!full_name || !username || !email || !password) {
       res.status(400).json({ message: "Please fill the all fields" });
       return;
@@ -31,8 +31,8 @@ const register = async (
 
     const newUser = new User({
       full_name,
-      username,
       email,
+      username,
       password: hashedPassword,
     });
     await newUser.save();

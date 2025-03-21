@@ -149,27 +149,16 @@ const getAllPosts = async (
     res.status(400).json({ message: "Invalid user ID" });
     return;
   }
-  const userId = req.user._id;
   if (!req.user || !req.user._id) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
   try {
-    console.log(userId, typeof userId);
-
-    const posts = await Post.find({ user_id: { $ne: userId } })
-      .populate("user_id", "username image")
-      .populate({
-        path: "comments",
-        populate: {
-          path: "user_id",
-          select: "username image",
-        },
-      })
-      .populate("likes", "user_id");
+    const posts = await Post.find().populate("user_id", "username image full_name");
     res.status(200).json({ message: "Posts", data: posts });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

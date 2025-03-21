@@ -31,6 +31,7 @@ export const getPostById = async (postId) => {
 export const getAllPosts = async () => {
   try {
     const response = await API.get(`${POSTS_BASE_URL}`);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error.response?.data || "Failed to fetch posts";
@@ -53,4 +54,14 @@ export const deletePost = async (postId) => {
   } catch (error) {
     throw error.response?.data || "Failed to delete post";
   }
+};
+
+export const likePost = async (postId) => {
+  const response = await API.post(`/like/${postId}`);
+  return response.data;
+};
+
+export const unlikePost = async (postId) => {
+  const response = await API.delete(`/like/${postId}`);
+  return response.data;
 };

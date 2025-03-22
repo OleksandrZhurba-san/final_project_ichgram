@@ -11,6 +11,15 @@ export const styles = {
     color: "#0095f6",
     fontSize: "12px",
     fontWeight: 700,
+    textTransform: "none",
+    cursor: "pointer",
+  },
+  unfollowBtn: {
+    color: "#99a7b0",
+    fontSize: "12px",
+    fontWeight: 700,
+    textTransform: "none",
+    cursor: "pointer",
   },
   likeUndCommentContainer: {
     display: "flex",

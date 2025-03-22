@@ -45,7 +45,11 @@ export const togglePostLike = createAsyncThunk(
     const post = posts.find((p) => p._id === postId);
     if (!post || !user) return rejectWithValue("Post or user not found");
 
-    const isLiked = post.likes.includes(user._id);
+    // Ensure we use populated user_id inside likes
+    const isLiked = post.likes.some((like) => {
+      const likeUserId = like?.user_id?._id || like?.user_id;
+      return likeUserId === user.id || likeUserId === user._id;
+    });
 
     try {
       if (isLiked) {
@@ -91,15 +95,20 @@ const postsSlice = createSlice({
         state.message = "";
       })
       .addCase(togglePostLike.fulfilled, (state, action) => {
-        const { postId, liked, userId } = action.payload;
+        state.isLoading = false;
+        state.isSuccess = true;
+        const { postId, userId, liked } = action.payload;
         const post = state.posts.find((p) => p._id === postId);
-        if (!post) return;
-        if (liked) {
-          post.likes.push(userId);
-          post.like_count += 1;
-        } else {
-          post.likes = post.likes.filter((id) => id !== userId);
-          post.like_count -= 1;
+        if (post) {
+          if (liked) {
+            post.likes.push({ user_id: userId }); // or just userId if not populated
+            post.likes_count += 1;
+          } else {
+            post.likes = post.likes.filter(
+              (like) => like.user_id !== userId && like !== userId
+            );
+            post.likes_count -= 1;
+          }
         }
       })
       .addCase(togglePostLike.rejected, (state, action) => {

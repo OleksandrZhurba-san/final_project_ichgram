@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPosts, togglePostLike } from "../../store/slices/postsSlice";
@@ -44,16 +44,17 @@ const Home = () => {
   const closeModal = async () => {
     setSelectedPost(null);
     setIsOpenModal(false);
-    await dispatch(fetchAllPosts());
+    // dispatch(fetchAllPosts());
     navigate(-1);
   };
 
+  //TODO: cause re-render the whole Home page
   const handleTogglePostLike = async (postId) => {
     try {
-      await dispatch(togglePostLike({ postId }));
-      dispatch(fetchAllPosts());
-    } catch (error) {
-      setError("Error toggling like:", error);
+      await dispatch(togglePostLike(postId));
+    } catch (err) {
+      setError("Error toggling like:", err);
+      console.error(error);
     }
   };
 
@@ -71,7 +72,10 @@ const Home = () => {
     }
   };
 
-  const filteredPosts = posts.filter((post) => post.user_id._id !== user.id);
+  const filteredPosts = useMemo(
+    () => posts.filter((post) => post.user_id._id !== user.id),
+    [posts, user.id]
+  );
 
   if (!isAuthLoaded) {
     return <Typography>Loading authentication...</Typography>;
@@ -80,7 +84,7 @@ const Home = () => {
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, p: 4 }}>
       {isLoading
-        ? Array.from({ length: 6 }).map((_, idx) => (
+        ? Array.from({ length: 4 }).map((_, idx) => (
             <SkeletonPostCard key={idx} />
           ))
         : filteredPosts.map((post) => (

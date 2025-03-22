@@ -28,7 +28,11 @@ const PostCard = ({
   imageOnly = false,
 }) => {
   const navigate = useNavigate();
-  const isLiked = post.likes.includes(user.id);
+  const isLiked = post.likes.some((like) => {
+    const likeUserId = like?.user_id?._id || like?.user_id;
+    return likeUserId === user.id || likeUserId === user._id;
+  });
+
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const toggleDescription = () => {
@@ -69,23 +73,23 @@ const PostCard = ({
         action={
           post.user_id._id !== user.id &&
           (isFollowing ? (
-            <Button
-              variant="outlined"
-              size="small"
-              sx={styles.followBtn}
+            <Typography
+              // variant="outlined"
+              // size="small"
+              sx={styles.unfollowBtn}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
               Unfollow
-            </Button>
+            </Typography>
           ) : (
-            <Button
-              variant="contained"
-              size="small"
-              sx={{ textTransform: "none" }}
+            <Typography
+              // variant="contained"
+              // size="small"
+              sx={styles.followBtn}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
               Follow
-            </Button>
+            </Typography>
           ))
         }
       />
@@ -96,7 +100,7 @@ const PostCard = ({
         image={post.images[0]}
         alt={post.description}
         sx={{ cursor: "pointer", maxHeight: "505px" }}
-        onClick={() => onModalOpen(post)}
+        onDoubleClick={() => onLikeToggle(post)}
       />
 
       <CardContent>

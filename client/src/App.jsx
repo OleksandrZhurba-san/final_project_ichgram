@@ -1,12 +1,13 @@
+import { Routes, Route, useNavigate } from "react-router-dom";
+import "./App.css"
 import { Box } from "@mui/material";
-import "./App.css";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { Home, Login, SignUp } from "./pages";
-import { Layout, ProtectedRoute, SideNav } from "./components";
+import { Login, SignUp, Home } from "./pages"
+import { ProtectedRoute, PostModal, Layout } from "./components";
 import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
 
-function App() {
+
+const App = () => {
   const mainBoxStyle = {
     maxWidth: 1440,
     margin: "0 auto",
@@ -23,19 +24,25 @@ function App() {
   return (
     <Box sx={mainBoxStyle}>
       <Routes>
-        {/**public */}
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />
 
-        {/**protected */}
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/home" element={<Home />} />
+            <Route path="/home" element={<Home />}>
+              {/* Nested route for modal inside /home */}
+              <Route path="post/:postId" element={<PostModal />} />
+            </Route>
           </Route>
         </Route>
+
+        <Route path="*" element={<div>Page not found</div>} />
       </Routes>
     </Box>
   );
-}
+};
 
 export default App;
+

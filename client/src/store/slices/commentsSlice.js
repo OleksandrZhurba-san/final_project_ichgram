@@ -33,8 +33,45 @@ export const removeComment = createAsyncThunk(
 const commentsSlice = createSlice({
   name: "comments",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {},
+  reducers: {
+    setCommentsFromPost: (state, action) => {
+      state.comments = action.payload.comments || [];
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(postComment.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(postComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.comments.push(action.payload.comment);
+      })
+      .addCase(postComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(removeComment.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(removeComment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.comments = state.comments.filter(
+          (comment) => comment._id !== action.payload.commentId
+        );
+      })
+      .addCase(removeComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      });
+  },
 });
 
+export const { setCommentsFromPost } = commentsSlice.actions;
 export default commentsSlice.reducer;

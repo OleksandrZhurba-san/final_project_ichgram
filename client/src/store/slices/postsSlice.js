@@ -76,7 +76,6 @@ const postsSlice = createSlice({
       .addCase(fetchAllPosts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        console.log(action.payload.data);
         state.posts = action.payload.data;
       })
       .addCase(fetchAllPosts.rejected, (state, action) => {

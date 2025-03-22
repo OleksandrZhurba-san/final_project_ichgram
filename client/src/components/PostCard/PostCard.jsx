@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -24,12 +24,35 @@ const PostCard = ({
   isFollowing,
   onLikeToggle,
   onFollowToggle,
-  // onImageClick,
+  onImageClick,
+  imageOnly = false,
 }) => {
   const navigate = useNavigate();
   const isUserFollowing = isFollowing[post.user_id._id];
-  const isLiked = post.likes.includes(user.id); // likes = array of user IDs
+  const isLiked = post.likes.includes(user.id);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
+  const toggleDescription = () => {
+    setShowFullDescription((prev) => !prev);
+  };
+
+  if (imageOnly) {
+    return (
+      <Box
+        component="img"
+        src={post.images[0]}
+        alt={post.description}
+        onClick={() => onImageClick(post)}
+        sx={{
+          width: 300,
+          height: 300,
+          objectFit: "cover",
+          borderRadius: 2,
+          cursor: "pointer",
+        }}
+      />
+    );
+  }
   return (
     <Card sx={styles.postContainer}>
       <CardHeader
@@ -38,7 +61,7 @@ const PostCard = ({
             src={post.user_id.image || UserIcon}
             alt={post.user_id.username}
             sx={{ cursor: "pointer" }}
-            onClick={() => navigate(`/profile/${post.user._id}`)}
+            onClick={() => navigate(`/profile/${post.user_id._id}`)}
           />
         }
         title={post.user_id.username}
@@ -49,7 +72,7 @@ const PostCard = ({
               variant="outlined"
               size="small"
               sx={styles.followBtn}
-              onClick={() => onFollowToggle(post.user._id)}
+              onClick={() => onFollowToggle(post.user_id._id)}
             >
               {isUserFollowing ? "Unfollow" : "Follow"}
             </Button>
@@ -63,7 +86,6 @@ const PostCard = ({
         image={post.images[0]} // use first image in array
         alt={post.description}
         sx={{ cursor: "pointer", maxHeight: "505px" }}
-        onClick={() => onImageClick(post)}
       />
 
       <CardContent>
@@ -86,19 +108,23 @@ const PostCard = ({
         </Box>
 
         <Box sx={styles.postDescriptionContainer}>
-          <Typography sx={styles.fullName}>{post.user_id.full_name}</Typography>
+          <Typography sx={styles.fullName}>{post.user_id.username}</Typography>
+
           <Typography sx={styles.description}>
-            {post.description.length > 30
+            {showFullDescription
+              ? post.description
+              : post.description.length > 30
               ? `${post.description.slice(0, 30)}...`
               : post.description}
           </Typography>
+
           {post.description.length > 30 && (
             <Button
               sx={styles.moreBtn}
               size="small"
-              onClick={() => onImageClick(post)}
+              onClick={toggleDescription}
             >
-              more
+              {showFullDescription ? "less" : "more"}
             </Button>
           )}
         </Box>

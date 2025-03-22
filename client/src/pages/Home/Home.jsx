@@ -9,14 +9,14 @@ import {
   addFollowing,
   deleteFollowing,
 } from "../../store/slices/followSlice";
-import { PostCard } from "../../components";
-// import PostModal from "../../components/postModal";
+import { PostCard, PostModal} from "../../components";
+
 
 const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { posts, isLoading } = useSelector((state) => state.posts);
-  const { user } = useSelector((state) => state.auth);
+  const { user, isAuthLoaded } = useSelector((state) => state.auth);
   const { followings } = useSelector((state) => state.follow);
 
   const [isFollowing, setIsFollowing] = useState({});
@@ -25,11 +25,17 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("Fetching posts");
-    dispatch(fetchAllPosts());
-    dispatch(getUserFollowings(user.id));
-    dispatch(getUserFollowers(user.id));
-  }, []);
+    if (!isAuthLoaded) return;
+    if (!user) {
+      navigate("/login");
+    } else {
+      dispatch(fetchAllPosts());
+      if (user?.id) {
+        dispatch(getUserFollowings(user.id));
+        dispatch(getUserFollowers(user.id));
+      }
+    }
+  }, [isAuthLoaded, user, dispatch, navigate]);
 
   useEffect(() => {
     if (followings?.length) {
@@ -85,6 +91,10 @@ const Home = () => {
     }
   };
   const filteredPosts = posts.filter((post) => post.user_id._id !== user.id);
+
+  if (!isAuthLoaded) {
+    return <Typography>Loading authentication...</Typography>;
+  }
 
   return (
     <Box

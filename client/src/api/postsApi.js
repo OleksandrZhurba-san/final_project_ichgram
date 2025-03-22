@@ -31,7 +31,6 @@ export const getPostById = async (postId) => {
 export const getAllPosts = async () => {
   try {
     const response = await API.get(`${POSTS_BASE_URL}`);
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw error.response?.data || "Failed to fetch posts";

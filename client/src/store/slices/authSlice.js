@@ -2,15 +2,17 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loginUserService, registerUserService } from "../../api/authApi";
 import { jwtDecode } from "jwt-decode";
 
+const token = localStorage.getItem("token");
+const user = token ? jwtDecode(token) : null;
+
 const initialState = {
-  user: localStorage.getItem("token")
-    ? jwtDecode(localStorage.getItem("token"))
-    : null,
-  token: localStorage.getItem("token") || null,
+  user,
+  token,
   isLoading: false,
   isError: false,
   isSuccess: false,
   message: "",
+  isAuthLoaded: !!token,
 };
 
 export const registerUser = createAsyncThunk(
@@ -74,12 +76,15 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.token = action.payload.data.token;
         localStorage.setItem("token", action.payload.data.token);
+        state.user = jwtDecode(action.payload.data.token);
+        state.isAuthLoaded = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;
         state.message = action.payload;
+        state.isAuthLoaded = true;
       });
   },
 });

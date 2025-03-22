@@ -35,7 +35,7 @@ const follow = async (
     });
 
     if (alreadyFollowing) {
-      res.status(401).json({ message: "Already following" });
+      res.status(409).json({ message: "Already following" });
       return;
     }
 

@@ -6,24 +6,26 @@ import {
   unfollowUser,
 } from "../../api/followApi";
 
-export const getUserFollowers = createAsyncThunk(
-  "follow/getFollowers",
-  async (userId, { rejectWithValue }) => {
-    try {
-      return await getFollowers(userId);
-    } catch (err) {
-      return rejectWithValue(err.response?.data || "Error fetching followers");
-    }
-  }
-);
-
 export const getUserFollowings = createAsyncThunk(
   "follow/getFollowings",
   async (userId, { rejectWithValue }) => {
     try {
-      return await getFollowings(userId);
+      const res = await getFollowings(userId);
+      return res;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Error fetching followings");
+    }
+  }
+);
+
+export const getUserFollowers = createAsyncThunk(
+  "follow/getFollowers",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const res = await getFollowers(userId);
+      return res;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error fetching followers");
     }
   }
 );
@@ -88,8 +90,19 @@ const followSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      .addCase(addFollowing.fulfilled, () => {})
-      .addCase(deleteFollowing.fulfilled, () => {});
+      .addCase(addFollowing.fulfilled, (state, action) => {
+        const followedUser = action.meta.arg;
+        if (!state.followings.find((user) => user._id === followedUser)) {
+          state.followings.push({ _id: followedUser });
+        }
+      })
+
+      .addCase(deleteFollowing.fulfilled, (state, action) => {
+        const unfollowedUser = action.meta.arg;
+        state.followings = state.followings.filter(
+          (user) => user._id !== unfollowedUser
+        );
+      });
   },
 });
 

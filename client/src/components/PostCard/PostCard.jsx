@@ -24,11 +24,10 @@ const PostCard = ({
   isFollowing,
   onLikeToggle,
   onFollowToggle,
-  onImageClick,
+  onModalOpen,
   imageOnly = false,
 }) => {
   const navigate = useNavigate();
-  const isUserFollowing = isFollowing[post.user_id._id];
   const isLiked = post.likes.includes(user.id);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -42,7 +41,7 @@ const PostCard = ({
         component="img"
         src={post.images[0]}
         alt={post.description}
-        onClick={() => onImageClick(post)}
+        onClick={() => onModalOpen(post)}
         sx={{
           width: 300,
           height: 300,
@@ -53,6 +52,7 @@ const PostCard = ({
       />
     );
   }
+
   return (
     <Card sx={styles.postContainer}>
       <CardHeader
@@ -67,25 +67,36 @@ const PostCard = ({
         title={post.user_id.username}
         subheader={`• ${timeAgo(post.created_at)}`}
         action={
-          post.user_id._id !== user?._id && (
+          post.user_id._id !== user.id &&
+          (isFollowing ? (
             <Button
               variant="outlined"
               size="small"
               sx={styles.followBtn}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
-              {isUserFollowing ? "Unfollow" : "Follow"}
+              Unfollow
             </Button>
-          )
+          ) : (
+            <Button
+              variant="contained"
+              size="small"
+              sx={{ textTransform: "none" }}
+              onClick={() => onFollowToggle(post.user_id._id)}
+            >
+              Follow
+            </Button>
+          ))
         }
       />
 
       <CardMedia
         component="img"
         height="400"
-        image={post.images[0]} // use first image in array
+        image={post.images[0]}
         alt={post.description}
         sx={{ cursor: "pointer", maxHeight: "505px" }}
+        onClick={() => onModalOpen(post)}
       />
 
       <CardContent>
@@ -98,7 +109,7 @@ const PostCard = ({
                 <FavoriteBorderIcon />
               )}
             </IconButton>
-            <IconButton onClick={() => onImageClick(post)}>
+            <IconButton onClick={() => onModalOpen(post)}>
               <ChatBubbleOutlineIcon />
             </IconButton>
           </Box>
@@ -109,7 +120,6 @@ const PostCard = ({
 
         <Box sx={styles.postDescriptionContainer}>
           <Typography sx={styles.fullName}>{post.user_id.username}</Typography>
-
           <Typography sx={styles.description}>
             {showFullDescription
               ? post.description
@@ -117,7 +127,6 @@ const PostCard = ({
               ? `${post.description.slice(0, 30)}...`
               : post.description}
           </Typography>
-
           {post.description.length > 30 && (
             <Button
               sx={styles.moreBtn}
@@ -132,7 +141,7 @@ const PostCard = ({
         <Button
           sx={styles.commentsContainer}
           size="small"
-          onClick={() => onImageClick(post)}
+          onClick={() => onModalOpen(post)}
         >
           {post.comments?.length > 0
             ? `View all comments (${post.comments.length})`

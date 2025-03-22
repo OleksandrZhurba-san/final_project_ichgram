@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPosts, togglePostLike } from "../../store/slices/postsSlice";
-import { useNavigate } from "react-router-dom";
 import {
   getUserFollowings,
   getUserFollowers,
   addFollowing,
   deleteFollowing,
 } from "../../store/slices/followSlice";
-import { PostCard, PostModal} from "../../components";
-
+import { PostCard, PostModal, SkeletonPostCard } from "../../components";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -19,10 +18,11 @@ const Home = () => {
   const { user, isAuthLoaded } = useSelector((state) => state.auth);
   const { followings } = useSelector((state) => state.follow);
 
-  const [isFollowing, setIsFollowing] = useState({});
   const [selectedPost, setSelectedPost] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [error, setError] = useState(null);
+
+  const followedIds = followings?.map((f) => f._id) || [];
 
   useEffect(() => {
     if (!isAuthLoaded) return;
@@ -30,24 +30,12 @@ const Home = () => {
       navigate("/login");
     } else {
       dispatch(fetchAllPosts());
-      if (user?.id) {
-        dispatch(getUserFollowings(user.id));
-        dispatch(getUserFollowers(user.id));
-      }
+      dispatch(getUserFollowings(user.id));
+      dispatch(getUserFollowers(user.id));
     }
   }, [isAuthLoaded, user, dispatch, navigate]);
 
-  useEffect(() => {
-    if (followings?.length) {
-      const followingStatus = {};
-      followings.forEach((follow) => {
-        followingStatus[follow.following] = true;
-      });
-      setIsFollowing(followingStatus);
-    }
-  }, [followings]);
-
-  const handleImageClick = (post) => {
+  const handleModalOpen = (post) => {
     setSelectedPost(post);
     setIsOpenModal(true);
     navigate(`post/${post._id}`);
@@ -70,26 +58,19 @@ const Home = () => {
   };
 
   const handleFollowToggle = async (postUserId) => {
-    const isUserFollowing = isFollowing[postUserId];
-
+    const isFollowing = followedIds.includes(postUserId);
     try {
-      if (isUserFollowing) {
+      if (isFollowing) {
         await dispatch(deleteFollowing(postUserId));
       } else {
         await dispatch(addFollowing(postUserId));
       }
-
-      await dispatch(getUserFollowings());
-      await dispatch(getUserFollowers());
-
-      setIsFollowing((prev) => ({
-        ...prev,
-        [postUserId]: !isUserFollowing,
-      }));
+      dispatch(getUserFollowings(user.id));
     } catch (error) {
       setError("Error updating follow status.", error);
     }
   };
+
   const filteredPosts = posts.filter((post) => post.user_id._id !== user.id);
 
   if (!isAuthLoaded) {
@@ -97,31 +78,22 @@ const Home = () => {
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 3,
-        padding: "58px 0 38px 78px",
-      }}
-    >
-      {isLoading ? (
-        <Typography variant="h6" align="center">
-          Loading posts...
-        </Typography>
-      ) : (
-        filteredPosts?.map((post) => (
-          <PostCard
-            key={post._id}
-            post={post}
-            user={user}
-            isFollowing={isFollowing}
-            onLikeToggle={handleTogglePostLike}
-            onFollowToggle={handleFollowToggle}
-            onImageClick={handleImageClick}
-          />
-        ))
-      )}
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, p: 4 }}>
+      {isLoading
+        ? Array.from({ length: 6 }).map((_, idx) => (
+            <SkeletonPostCard key={idx} />
+          ))
+        : filteredPosts.map((post) => (
+            <PostCard
+              key={post._id}
+              post={post}
+              user={user}
+              isFollowing={followedIds.includes(post.user_id._id)}
+              onLikeToggle={handleTogglePostLike}
+              onFollowToggle={handleFollowToggle}
+              onModalOpen={handleModalOpen}
+            />
+          ))}
 
       {selectedPost && (
         <PostModal

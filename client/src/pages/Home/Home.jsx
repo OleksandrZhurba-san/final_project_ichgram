@@ -10,6 +10,7 @@ import {
 } from "../../store/slices/followSlice";
 import { PostCard, PostModal, SkeletonPostCard } from "../../components";
 import { useNavigate } from "react-router-dom";
+import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ const Home = () => {
   }, [isAuthLoaded, user, dispatch, navigate]);
 
   const handleModalOpen = (post) => {
+    dispatch(getAllCommentsByPost(post._id));
     setSelectedPost(post);
     setIsOpenModal(true);
     navigate(`post/${post._id}`);

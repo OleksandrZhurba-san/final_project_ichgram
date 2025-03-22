@@ -148,7 +148,7 @@ const PostCard = ({
           onClick={() => onModalOpen(post)}
         >
           {post.comments?.length > 0
-            ? `View all comments (${post.comments.length})`
+            ? `View all comments (${post.comments_count})`
             : "No comments"}
         </Button>
       </CardContent>

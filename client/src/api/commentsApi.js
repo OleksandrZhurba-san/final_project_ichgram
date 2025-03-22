@@ -22,3 +22,12 @@ export const deleteComment = async (commentId) => {
     throw error.response?.data || "Failed to delete comment";
   }
 };
+
+export const getAllCommentsByPostId = async (postId) => {
+  try {
+    const response = await API.get(`${COMMENTS_BASE_URL}/${postId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || "Failed to fetch comments";
+  }
+};

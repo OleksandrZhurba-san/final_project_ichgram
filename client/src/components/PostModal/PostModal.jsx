@@ -18,7 +18,7 @@ import UserIcon from "../../assets/icons/user.svg";
 import { useSelector, useDispatch } from "react-redux";
 import {
   postComment,
-  setCommentsFromPost,
+  getAllCommentsByPost,
 } from "../../store/slices/commentsSlice";
 import { togglePostLike } from "../../store/slices/postsSlice";
 import { timeAgo } from "../../utils/date";
@@ -35,16 +35,24 @@ const PostModal = ({ post, closeModal, isOpenModal }) => {
 
   useEffect(() => {
     if (post && isOpenModal) {
-      dispatch(setCommentsFromPost(post?._id));
+      dispatch(getAllCommentsByPost(post._id));
     }
   }, [dispatch, post, isOpenModal]);
+  useEffect(() => {
+    console.log(comments);
+  }, [comments]);
 
   const handleAddComment = async () => {
-    console.log(comments);
     if (!newComment.trim()) return;
-    dispatch(postComment({ postId: post?._id, commentText: newComment }));
-    setNewComment("");
-    dispatch(setCommentsFromPost(post?.comments));
+
+    const resultAction = await dispatch(
+      postComment({ postId: post._id, text: newComment })
+    );
+
+    if (postComment.fulfilled.match(resultAction)) {
+      setNewComment("");
+      // Comment is already added via fulfilled reducer
+    }
   };
 
   const handleTogglePostLike = async () => {
@@ -120,16 +128,16 @@ const PostModal = ({ post, closeModal, isOpenModal }) => {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
                 >
                   <Avatar
-                    src={comment?.user?.avatar}
-                    alt={comment?.user?.username}
+                    src={comment?.user_id?.image || UserIcon}
+                    alt={comment?.user_id?.username}
                     sx={{ width: 30, height: 30 }}
                   />
                   <Box>
                     <Typography variant="subtitle2" fontWeight={600}>
-                      {comment?.user?.username}
+                      {comment?.user_id?.username}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "gray" }}>
-                      {comment?.commentText}
+                      {comment?.text}
                     </Typography>
                   </Box>
                 </Box>

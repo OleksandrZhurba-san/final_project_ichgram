@@ -27,14 +27,11 @@ const SignUp = () => {
       if (result.meta.requestStatus === "fulfilled") {
         navigate("/login");
       } else if (result.payload) {
-        console.log(result.payload);
         if (result.payload.toLowerCase().includes("already")) {
           setError("username", { type: "server", message: result.payload });
-          console.log(result.payload);
         }
         if (result.payload.toLowerCase().includes("already")) {
           setError("email", { type: "server", message: result.payload });
-          console.log(result.payload);
         }
       }
     });

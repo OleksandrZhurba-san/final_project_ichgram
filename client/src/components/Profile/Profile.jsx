@@ -16,6 +16,8 @@ import { fetchUserById } from "../../store/slices/userSlice";
 import {
   getUserFollowers,
   getUserFollowings,
+  addFollowing,
+  deleteFollowing,
 } from "../../store/slices/followSlice";
 import {
   getPostsByUser,
@@ -35,22 +37,29 @@ const Profile = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
   const { user } = useSelector((state) => state.auth);
-  const { currentUser, isLoading } = useSelector((state) => state.user);
+  const { currentUser, loggedInUser, isLoading } = useSelector(
+    (state) => state.user
+  );
   const { posts } = useSelector((state) => state.posts);
   const { followers, followings } = useSelector((state) => state.follow);
 
   const isOwnProfile = !userId || userId === user?.id;
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const isFollowing = followings?.some(
+    (following) => following._id === currentUser?.data?._id
+  );
 
   useEffect(() => {
     const targetUserId = userId || user?.id;
     if (targetUserId) {
-      dispatch(fetchUserById(targetUserId));
+      if (!isOwnProfile) {
+        dispatch(fetchUserById(targetUserId));
+      }
       dispatch(getPostsByUser(targetUserId));
       dispatch(getUserFollowers(targetUserId));
-      dispatch(getUserFollowings(targetUserId));
+      dispatch(getUserFollowings(user.id));
     }
-  }, [dispatch, userId, user]);
+  }, [dispatch, userId, user, isOwnProfile]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -59,6 +68,19 @@ const Profile = () => {
 
   const handleEditProfile = () => {
     navigate("/profile/edit");
+  };
+
+  const handleFollowToggle = async () => {
+    try {
+      if (isFollowing) {
+        await dispatch(deleteFollowing(userId));
+      } else {
+        await dispatch(addFollowing(userId));
+      }
+      dispatch(getUserFollowings(user.id));
+    } catch (error) {
+      console.error("Error updating follow status:", error);
+    }
   };
 
   const handleImageClick = async (post) => {
@@ -77,9 +99,15 @@ const Profile = () => {
     setIsOpenModal(false);
   };
 
-  if (isLoading || !currentUser) {
+  if (
+    isLoading ||
+    (!currentUser && !isOwnProfile) ||
+    (!loggedInUser && isOwnProfile)
+  ) {
     return <CircularProgress sx={{ mt: 4, mx: "auto" }} />;
   }
+
+  const profileData = isOwnProfile ? loggedInUser : currentUser;
 
   return (
     <Box
@@ -109,8 +137,8 @@ const Profile = () => {
           }}
         >
           <Avatar
-            src={currentUser?.data?.image || UserIcon}
-            alt={currentUser?.data?.username}
+            src={profileData?.data?.image || UserIcon}
+            alt={profileData?.data?.username}
             sx={{
               width: { xs: 86, md: 150 },
               height: { xs: 86, md: 150 },
@@ -133,9 +161,9 @@ const Profile = () => {
               variant="h6"
               sx={{ textAlign: { xs: "center", md: "left" } }}
             >
-              {currentUser?.data?.username}
+              {profileData?.data?.username}
             </Typography>
-            {isOwnProfile && (
+            {isOwnProfile ? (
               <Box
                 sx={{
                   display: "flex",
@@ -159,6 +187,22 @@ const Profile = () => {
                   Logout
                 </Button>
               </Box>
+            ) : (
+              <Button
+                variant={isFollowing ? "outlined" : "contained"}
+                onClick={handleFollowToggle}
+                fullWidth={isMobile}
+                sx={{
+                  textTransform: "none",
+                  px: { xs: 4, md: 6 },
+                  py: { xs: 0.5, md: 1 },
+                  fontSize: { xs: "14px", md: "14px" },
+                  fontWeight: 600,
+                  minWidth: "auto",
+                }}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </Button>
             )}
           </Box>
 
@@ -175,20 +219,20 @@ const Profile = () => {
             <Typography>{followings?.length || 0} following</Typography>
           </Box>
 
-          {currentUser?.data?.bio && (
+          {profileData?.data?.bio && (
             <Typography
               sx={{
                 mt: 2,
                 textAlign: { xs: "center", md: "left" },
               }}
             >
-              {currentUser.data.bio}
+              {profileData.data.bio}
             </Typography>
           )}
 
-          {currentUser?.data?.website && (
+          {profileData?.data?.website && (
             <Link
-              href={currentUser.data.website}
+              href={profileData.data.website}
               target="_blank"
               sx={{
                 display: "block",
@@ -196,7 +240,7 @@ const Profile = () => {
                 mt: 1,
               }}
             >
-              {currentUser.data.website}
+              {profileData.data.website}
             </Link>
           )}
         </Box>

@@ -3,6 +3,7 @@ import { getUserById, updateUser } from "../../api/userApi";
 
 const initialState = {
   currentUser: null,
+  loggedInUser: null,
   isLoading: false,
   isError: false,
   isSuccess: false,
@@ -17,6 +18,20 @@ export const fetchUserById = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to fetch user");
+    }
+  }
+);
+
+export const fetchLoggedInUser = createAsyncThunk(
+  "user/fetchLoggedInUser",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const data = await getUserById(userId);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch logged in user"
+      );
     }
   }
 );
@@ -39,6 +54,7 @@ const userSlice = createSlice({
   reducers: {
     clearUserState: (state) => {
       state.currentUser = null;
+      state.loggedInUser = null;
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = false;
@@ -71,8 +87,26 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.currentUser = action.payload;
+        if (state.loggedInUser?.data?._id === action.payload.data?._id) {
+          state.loggedInUser = action.payload;
+        }
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(fetchLoggedInUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = "";
+      })
+      .addCase(fetchLoggedInUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.loggedInUser = action.payload;
+      })
+      .addCase(fetchLoggedInUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

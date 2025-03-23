@@ -13,10 +13,14 @@ import {
 import { ProtectedRoute, Layout } from "./components";
 import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchLoggedInUser } from "./store/slices/userSlice";
 
 const App = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -28,6 +32,12 @@ const App = () => {
       navigate("/login");
     }
   }, [navigate, location.pathname]);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchLoggedInUser(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   return (
     <Box

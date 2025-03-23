@@ -11,7 +11,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { CreatePostModal } from "../../components";
 // import SearchBar from "../searchBar";
 
@@ -29,8 +29,7 @@ import Search from "../../assets/icons/search_navbar.svg";
 import SearchFilled from "../../assets/icons/search_filled_navbar.svg";
 import User from "../../assets/icons/user.svg";
 import Logo from "../../assets/ichgram-logo.png";
-import { useDispatch } from "react-redux";
-import { fetchUserById } from "../../store/slices/userSlice";
+import { fetchLoggedInUser } from "../../store/slices/userSlice";
 
 const SideNav = () => {
   const theme = useTheme();
@@ -38,11 +37,17 @@ const SideNav = () => {
   const [activeLink, setActiveLink] = useState("/home");
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const user = useSelector((state) => state.auth.user);
-  const { currentUser } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.auth);
+  const { loggedInUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleLinkClick = (link) => setActiveLink(link);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchLoggedInUser(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   const menuItems = useMemo(
     () => [
@@ -76,73 +81,74 @@ const SideNav = () => {
       {
         label: "Profile",
         path: "/profile",
-        icon: currentUser?.data?.image || User,
+        icon: loggedInUser?.data?.image || User,
       },
     ],
-    [currentUser?.data?.image]
+    [loggedInUser?.data?.image]
   );
-
-  useEffect(() => {
-    if (user?.id) {
-      dispatch(fetchUserById(user.id));
-    }
-  }, [dispatch, user?.id]);
 
   return (
     <Box
       sx={{
+        height: "100vh",
+        borderRight: "1px solid",
+        borderColor: "divider",
+        position: "fixed",
+        bgcolor: "background.paper",
+        width: isMobile ? "auto" : 244,
         display: "flex",
         flexDirection: "column",
-        padding: isMobile ? "28px 0 0 0" : "28px 0 0 25px",
-        maxWidth: isMobile ? "60px" : "244px",
-        width: "100%",
-        borderRight: "1px solid #dbdbdb",
-        gap: "24px",
-        transition: "all 0.3s ease",
       }}
     >
-      {!isMobile && (
-        <Box
-          component="img"
-          src={Logo}
-          alt="logo"
-          sx={{
-            height: "55px",
-            width: "97px",
-            mb: 2,
-            transition: "all 0.3s ease",
-          }}
-        />
-      )}
+      <Box
+        component={NavLink}
+        to="/home"
+        sx={{
+          py: isMobile ? 2 : 4,
+          px: isMobile ? 2 : 3,
+          display: "flex",
+          alignItems: "center",
+          textDecoration: "none",
+          color: "inherit",
+        }}
+      >
+        {!isMobile && (
+          <Box
+            component="img"
+            src={Logo}
+            alt="Logo"
+            sx={{ height: "32px", width: "103px" }}
+          />
+        )}
+        {isMobile && (
+          <Box
+            component="img"
+            src={Logo}
+            alt="Logo"
+            sx={{ height: "24px", width: "24px" }}
+          />
+        )}
+      </Box>
 
-      <List>
+      <List sx={{ flex: 1, px: isMobile ? 0 : 1 }}>
         {menuItems.map(
           ({ label, path, icon, activeIcon, isSearch, isCreate }) => (
             <ListItemButton
               key={path}
-              component={isSearch || isCreate ? "button" : NavLink}
-              to={!isSearch && !isCreate ? path : undefined}
-              onClick={(e) => {
-                if (isSearch) {
-                  e.preventDefault();
-                  setIsSearchModalOpen(true);
-                } else if (isCreate) {
-                  e.preventDefault();
-                  setIsCreatePostOpen(true);
-                } else {
-                  handleLinkClick(path);
-                }
+              component={NavLink}
+              to={path}
+              onClick={() => {
+                handleLinkClick(path);
+                if (isSearch) setIsSearchModalOpen(true);
+                if (isCreate) setIsCreatePostOpen(true);
               }}
               sx={{
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-                fontWeight: activeLink === path ? 800 : 400,
-                color: "#000000",
+                borderRadius: 2,
                 mb: 1,
-                width: "100%",
-                justifyContent: isMobile ? "center" : "flex-start",
-                padding: isMobile ? "8px" : "8px 16px",
+                px: isMobile ? 2 : 2,
+                "&.active": {
+                  bgcolor: "action.selected",
+                },
               }}
             >
               <ListItemIcon
@@ -155,8 +161,8 @@ const SideNav = () => {
               >
                 {label === "Profile" ? (
                   <Avatar
-                    src={currentUser?.data?.image || User}
-                    alt={currentUser?.data?.username}
+                    src={loggedInUser?.data?.image || User}
+                    alt={loggedInUser?.data?.username}
                     sx={{
                       width: isMobile ? 24 : 32,
                       height: isMobile ? 24 : 32,

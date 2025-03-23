@@ -101,30 +101,39 @@ const PostCard = ({
       }}
     >
       <CardHeader
+        sx={{
+          p: { xs: 1, md: 2 },
+          "& .MuiCardHeader-content": {
+            display: "flex",
+            alignItems: "center",
+          },
+          "& .MuiCardHeader-title": {
+            fontSize: { xs: "14px", md: "14px" },
+            fontWeight: 600,
+            color: "text.primary",
+          },
+          "& .MuiCardHeader-subheader": {
+            fontSize: { xs: "12px", md: "12px" },
+            ml: 1,
+          },
+        }}
         avatar={
           <Avatar
             src={post.user_id.image || UserIcon}
             alt={post.user_id.username}
-            sx={{ cursor: "pointer" }}
+            sx={{
+              cursor: "pointer",
+              width: 32,
+              height: 32,
+            }}
             onClick={() => navigate(`/profile/${post.user_id._id}`)}
           />
         }
         title={post.user_id.username}
-        subheader={`• ${timeAgo(post.created_at)}`}
+        subheader={timeAgo(post.created_at)}
         action={
           post.user_id._id !== user.id &&
-          (isFollowing ? (
-            <Typography
-              sx={{
-                ...styles.unfollowBtn,
-                px: { xs: 1, md: 2 },
-                fontSize: { xs: "12px", md: "14px" },
-              }}
-              onClick={() => onFollowToggle(post.user_id._id)}
-            >
-              Unfollow
-            </Typography>
-          ) : (
+          !isFollowing && (
             <Typography
               sx={{
                 ...styles.followBtn,
@@ -133,9 +142,9 @@ const PostCard = ({
               }}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
-              Follow
+              follow
             </Typography>
-          ))
+          )
         }
       />
 
@@ -153,12 +162,13 @@ const PostCard = ({
         onDoubleClick={handleLikeToggle}
       />
 
-      <CardContent>
-        <Box sx={styles.likeUndCommentContainer}>
+      <CardContent sx={{ p: { xs: 1, md: 2 } }}>
+        <Box sx={{ ...styles.likeUndCommentContainer, mb: 1 }}>
           <Box sx={styles.likeUndCommentImgContainer}>
             <IconButton
               onClick={handleLikeToggle}
               size={isMobile ? "small" : "medium"}
+              sx={{ p: { xs: 1, md: 1 }, ml: -1 }}
             >
               {isLiked ? (
                 <FavoriteIcon sx={{ color: "red" }} />
@@ -169,28 +179,59 @@ const PostCard = ({
             <IconButton
               onClick={() => onModalOpen(post)}
               size={isMobile ? "small" : "medium"}
+              sx={{ p: { xs: 1, md: 1 } }}
             >
               <ChatBubbleOutlineIcon />
             </IconButton>
           </Box>
-          <Typography sx={styles.likeCount}>
-            {isLoading ? "Loading..." : `${likeCount} likes`}
-          </Typography>
         </Box>
 
-        <Box sx={styles.postDescriptionContainer}>
-          <Typography sx={styles.fullName}>{post.user_id.username}</Typography>
-          <Typography sx={styles.description}>
-            {showFullDescription
-              ? post.description
-              : post.description.length > 30
-              ? `${post.description.slice(0, 30)}...`
-              : post.description}
-          </Typography>
+        <Typography
+          sx={{
+            ...styles.likeCount,
+            fontSize: "14px",
+            fontWeight: 600,
+            mb: 1,
+          }}
+        >
+          {isLoading ? "Loading..." : `${likeCount} likes`}
+        </Typography>
+
+        <Box sx={{ ...styles.postDescriptionContainer, mb: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start" }}>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 600,
+                mr: 1,
+              }}
+            >
+              {post.user_id.username}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                color: "text.primary",
+                flex: 1,
+              }}
+            >
+              {showFullDescription
+                ? post.description
+                : post.description.length > 30
+                ? `${post.description.slice(0, 30)}...`
+                : post.description}
+            </Typography>
+          </Box>
           {post.description.length > 30 && (
             <Button
-              sx={styles.moreBtn}
-              size="small"
+              sx={{
+                ...styles.moreBtn,
+                p: 0,
+                minWidth: "auto",
+                fontSize: "12px",
+                color: "text.secondary",
+                textTransform: "lowercase",
+              }}
               onClick={toggleDescription}
             >
               {showFullDescription ? "less" : "more"}
@@ -199,12 +240,18 @@ const PostCard = ({
         </Box>
 
         <Button
-          sx={styles.commentsContainer}
-          size="small"
+          sx={{
+            ...styles.commentsContainer,
+            p: 0,
+            minWidth: "auto",
+            fontSize: "14px",
+            color: "text.secondary",
+            textTransform: "none",
+          }}
           onClick={() => onModalOpen(post)}
         >
           {post.comments?.length > 0
-            ? `View all comments (${post.comments_count})`
+            ? `View all ${post.comments_count} comments`
             : "No comments"}
         </Button>
       </CardContent>

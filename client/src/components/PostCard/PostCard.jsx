@@ -39,7 +39,6 @@ const PostCard = ({
   useEffect(() => {
     const fetchLikeStatus = async () => {
       try {
-        console.log("Fetching like status for post:", post._id);
         await dispatch(fetchPostLikeStatus(post._id)).unwrap();
       } catch (error) {
         console.error("Error fetching like status:", error);
@@ -59,16 +58,16 @@ const PostCard = ({
 
   const handleLikeToggle = async () => {
     try {
-      console.log("Toggling like for post:", post._id);
       await dispatch(togglePostLike(post._id)).unwrap();
     } catch (error) {
       console.error("Error toggling like:", error);
     }
   };
 
+  const isLiked = likesByPostId[post._id]?.liked || false;
+  const likeCount = likesByPostId[post._id]?.count || 0;
+
   if (imageOnly) {
-    console.log("PostCard imageOnly post:", post);
-    console.log("PostCard imageOnly post.images:", post.images);
     return (
       <Box
         component="img"
@@ -76,24 +75,18 @@ const PostCard = ({
         alt={post.description}
         onClick={() => onModalOpen(post)}
         sx={{
-          width: 300,
-          height: 300,
+          width: "100%",
+          height: "100%",
+          maxWidth: "300px",
+          maxHeight: "400px",
           objectFit: "cover",
           borderRadius: 2,
           cursor: "pointer",
+          display: "block",
         }}
       />
     );
   }
-
-  const isLiked = likesByPostId[post._id]?.liked || false;
-  const likeCount = likesByPostId[post._id]?.count || 0;
-
-  console.log("PostCard render - post:", post._id, {
-    isLiked,
-    likeCount,
-    likesByPostId: likesByPostId[post._id],
-  });
 
   return (
     <Card sx={styles.postContainer}>

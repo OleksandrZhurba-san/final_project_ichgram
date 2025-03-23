@@ -1,7 +1,7 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
-import { Login, SignUp, Home, ProfilePage } from "./pages";
+import { Login, SignUp, Home, ProfilePage, EditProfile } from "./pages";
 import { ProtectedRoute, Layout } from "./components";
 import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
@@ -12,14 +12,19 @@ const App = () => {
     margin: "0 auto",
   };
   const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const isPublicRoute =
+      location.pathname === "/login" || location.pathname === "/sign-up";
 
-    if (!token || isTokenExpired(token)) {
+    if (!isPublicRoute && (!token || isTokenExpired(token))) {
       localStorage.removeItem("token");
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, location.pathname]);
+
   return (
     <Box sx={mainBoxStyle}>
       <Routes>
@@ -31,9 +36,9 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/home" element={<Home />} />
-            {/* Profile routes */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<ProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
           </Route>
         </Route>
 

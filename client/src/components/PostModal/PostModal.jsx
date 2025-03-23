@@ -89,12 +89,14 @@ const PostModal = ({ closeModal, isOpenModal }) => {
     <Dialog
       open={isOpenModal}
       onClose={closeModal}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       PaperProps={{
         sx: {
           maxHeight: "90vh",
           height: "90vh",
+          maxWidth: "1000px",
+          width: "100%",
         },
       }}
     >

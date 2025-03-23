@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
-// import CreateNewPost from "../createNewPost";
+import { CreatePostModal } from "../../components";
 // import SearchBar from "../searchBar";
 
 // Icons
@@ -29,7 +29,7 @@ import Logo from "../../assets/ichgram-logo.png";
 
 const SideNav = () => {
   const [activeLink, setActiveLink] = useState("/home");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
 
@@ -101,7 +101,7 @@ const SideNav = () => {
                   setIsSearchModalOpen(true);
                 } else if (isCreate) {
                   e.preventDefault();
-                  setIsModalOpen(true);
+                  setIsCreatePostOpen(true);
                 } else {
                   handleLinkClick(path);
                 }
@@ -131,9 +131,10 @@ const SideNav = () => {
       </List>
 
       {/* Create Post Modal */}
-      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {/* <CreateNewPost closeModal={() => setIsModalOpen(false)} /> */}
-      </Dialog>
+      <CreatePostModal
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+      />
 
       {/* Search Modal */}
       <Dialog

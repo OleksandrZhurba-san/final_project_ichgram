@@ -5,7 +5,7 @@ import PostCard from "./PostCard/PostCard";
 import PostModal from "./PostModal/PostModal";
 import SkeletonPostCard from "./SkeletonPostCard/SkeletonPostCard";
 import Profile from "./Profile/Profile";
-
+import CreatePostModal from "./CreatePostModal/CreatePostModal";
 export {
   SideNav,
   ProtectedRoute,
@@ -14,4 +14,5 @@ export {
   PostModal,
   SkeletonPostCard,
   Profile,
+  CreatePostModal,
 };

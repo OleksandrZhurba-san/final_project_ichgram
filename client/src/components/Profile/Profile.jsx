@@ -123,13 +123,22 @@ const Profile = () => {
       <Grid container spacing={2} mt={6}>
         {posts?.length > 0 ? (
           posts.map((post) => (
-            <Grid key={post._id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-              <PostCard
-                post={post}
-                user={currentUser}
-                imageOnly
-                onModalOpen={handleImageClick}
-              />
+            <Grid key={post._id} size={{ sx: 12, sm: 6, md: 4, lg: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  p: 0.5,
+                }}
+              >
+                <PostCard
+                  post={post}
+                  user={currentUser}
+                  imageOnly
+                  onModalOpen={handleImageClick}
+                />
+              </Box>
             </Grid>
           ))
         ) : (

@@ -13,7 +13,6 @@ export const fetchPostLikeStatus = createAsyncThunk(
   async (postId, { rejectWithValue }) => {
     try {
       const response = await getLikesByPost(postId);
-      console.log("Fetch like status response:", response);
       return { postId, ...response.data };
     } catch (error) {
       console.error("Error fetching like status:", error);
@@ -27,7 +26,6 @@ export const togglePostLike = createAsyncThunk(
   async (postId, { rejectWithValue }) => {
     try {
       const response = await toggleLike(postId);
-      console.log("Toggle like response:", response);
 
       // Check if response has the expected structure
       if (!response || typeof response !== "object") {
@@ -53,7 +51,6 @@ export const togglePostLike = createAsyncThunk(
         liked,
         count,
       };
-      console.log("Returning payload:", payload);
       return payload;
     } catch (error) {
       console.error("Error toggling like:", error);
@@ -76,7 +73,6 @@ const likeSlice = createSlice({
       .addCase(fetchPostLikeStatus.fulfilled, (state, action) => {
         state.isLoading = false;
         const { postId, count, liked } = action.payload;
-        console.log("Updating like state for post:", postId, { count, liked });
         state.likesByPostId[postId] = { count, liked };
       })
       .addCase(fetchPostLikeStatus.rejected, (state, action) => {
@@ -92,16 +88,7 @@ const likeSlice = createSlice({
       .addCase(togglePostLike.fulfilled, (state, action) => {
         state.isLoading = false;
         const { postId, count, liked } = action.payload;
-        console.log("Updating like state after toggle for post:", postId, {
-          count,
-          liked,
-        });
-        console.log(
-          "Current state before update:",
-          state.likesByPostId[postId]
-        );
         state.likesByPostId[postId] = { count, liked };
-        console.log("Updated state:", state.likesByPostId[postId]);
       })
       .addCase(togglePostLike.rejected, (state, action) => {
         state.isLoading = false;

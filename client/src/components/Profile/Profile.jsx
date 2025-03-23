@@ -9,6 +9,8 @@ import {
   Typography,
   Link,
   CircularProgress,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { fetchUserById } from "../../store/slices/userSlice";
 import {
@@ -27,6 +29,8 @@ import PostCard from "../PostCard/PostCard";
 import UserIcon from "../../assets/icons/user.svg";
 
 const Profile = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userId } = useParams();
@@ -78,75 +82,192 @@ const Profile = () => {
   }
 
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, width: "100%" }}>
-      <Grid container spacing={4}>
-        <Grid size={{ xs: 12, md: 4 }}>
+    <Box
+      sx={{
+        p: { xs: 0, md: 4 },
+        width: "100%",
+        maxWidth: "100%",
+      }}
+    >
+      {/* Profile Header */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: { xs: "center", md: "flex-start" },
+          gap: { xs: 2, md: 8 },
+          mb: { xs: 2, md: 4 },
+          p: { xs: 2, md: 0 },
+        }}
+      >
+        {/* Avatar */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            width: { xs: "100%", md: "auto" },
+          }}
+        >
           <Avatar
             src={currentUser?.data?.image || UserIcon}
             alt={currentUser?.data?.username}
-            sx={{ width: 150, height: 150 }}
+            sx={{
+              width: { xs: 86, md: 150 },
+              height: { xs: 86, md: 150 },
+            }}
           />
-        </Grid>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="h6">{currentUser?.data?.username}</Typography>
-            {isOwnProfile ? (
-              <>
-                <Button variant="outlined" onClick={handleEditProfile}>
+        </Box>
+
+        {/* Profile Info */}
+        <Box sx={{ flex: 1, width: { xs: "100%", md: "auto" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "center", md: "flex-start" },
+              gap: 2,
+              mb: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ textAlign: { xs: "center", md: "left" } }}
+            >
+              {currentUser?.data?.username}
+            </Typography>
+            {isOwnProfile && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  flexDirection: { xs: "column", md: "row" },
+                  width: { xs: "100%", md: "auto" },
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={handleEditProfile}
+                  fullWidth={isMobile}
+                >
                   Edit Profile
                 </Button>
-                <Button variant="outlined" onClick={handleLogout}>
+                <Button
+                  variant="outlined"
+                  onClick={handleLogout}
+                  fullWidth={isMobile}
+                >
                   Logout
                 </Button>
-              </>
-            ) : null}
+              </Box>
+            )}
           </Box>
 
-          <Box display="flex" gap={5} mt={2}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: { xs: 3, md: 5 },
+              justifyContent: { xs: "center", md: "flex-start" },
+              mb: 2,
+            }}
+          >
             <Typography>{posts?.length || 0} posts</Typography>
             <Typography>{followers?.length || 0} followers</Typography>
             <Typography>{followings?.length || 0} following</Typography>
           </Box>
 
           {currentUser?.data?.bio && (
-            <Typography mt={2}>{currentUser.data.bio}</Typography>
+            <Typography
+              sx={{
+                mt: 2,
+                textAlign: { xs: "center", md: "left" },
+              }}
+            >
+              {currentUser.data.bio}
+            </Typography>
           )}
 
           {currentUser?.data?.website && (
-            <Link href={currentUser.data.website} target="_blank">
+            <Link
+              href={currentUser.data.website}
+              target="_blank"
+              sx={{
+                display: "block",
+                textAlign: { xs: "center", md: "left" },
+                mt: 1,
+              }}
+            >
               {currentUser.data.website}
             </Link>
           )}
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
-      <Grid container spacing={2} mt={6}>
+      {/* Posts Grid */}
+      <Grid
+        container
+        spacing={{ xs: 0.5, md: 2 }}
+        sx={{
+          mt: { xs: 0, md: 4 },
+          mx: { xs: -0.25, md: 0 },
+          width: { xs: "calc(100% + 4px)", md: "100%" },
+        }}
+      >
         {posts?.length > 0 ? (
           posts.map((post) => (
-            <Grid key={post._id} size={{ sx: 12, sm: 6, md: 4, lg: 3 }}>
+            <Grid
+              key={post._id}
+              size={{
+                xs: 4,
+                md: 4,
+              }}
+            >
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  p: 0.5,
+                  position: "relative",
+                  paddingTop: "100%",
+                  cursor: "pointer",
+                  "&:hover": {
+                    opacity: 0.9,
+                  },
+                  transition: "opacity 0.2s ease",
                 }}
               >
-                <PostCard
-                  post={post}
-                  user={currentUser}
-                  imageOnly
-                  onModalOpen={handleImageClick}
+                <Box
+                  onClick={() => handleImageClick(post)}
+                  component="img"
+                  src={post.images[0]}
+                  alt="Post"
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               </Box>
             </Grid>
           ))
         ) : (
-          <Typography>No posts available</Typography>
+          <Grid size={12}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                py: { xs: 2, md: 4 },
+              }}
+            >
+              No posts available
+            </Typography>
+          </Grid>
         )}
       </Grid>
 
-      <PostModal isOpenModal={isOpenModal} closeModal={closeModal} />
+      <PostModal
+        isOpenModal={isOpenModal}
+        closeModal={closeModal}
+        fullScreen={isMobile}
+      />
     </Box>
   );
 };

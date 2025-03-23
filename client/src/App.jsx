@@ -1,3 +1,4 @@
+import React from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
@@ -14,10 +15,6 @@ import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
 
 const App = () => {
-  const mainBoxStyle = {
-    maxWidth: 1440,
-    margin: "0 auto",
-  };
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,7 +30,14 @@ const App = () => {
   }, [navigate, location.pathname]);
 
   return (
-    <Box sx={mainBoxStyle}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "#fafafa",
+        width: "100%",
+      }}
+    >
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />

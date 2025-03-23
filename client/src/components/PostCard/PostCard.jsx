@@ -9,14 +9,16 @@ import {
   Typography,
   Button,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { timeAgo } from "../../utils/date.js";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { useNavigate } from "react-router-dom";
-import { timeAgo } from "../../utils/date.js";
-import UserIcon from "../../assets/icons/user.svg";
 import { styles } from "./PostCardStyles.js";
+import UserIcon from "../../assets/icons/user.svg";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchPostLikeStatus,
@@ -31,6 +33,8 @@ const PostCard = ({
   onModalOpen,
   imageOnly = false,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { likesByPostId } = useSelector((state) => state.likes);
@@ -89,7 +93,13 @@ const PostCard = ({
   }
 
   return (
-    <Card sx={styles.postContainer}>
+    <Card
+      sx={{
+        ...styles.postContainer,
+        borderRadius: { xs: 0, md: 2 },
+        border: { xs: "none", md: "1px solid #dbdbdb" },
+      }}
+    >
       <CardHeader
         avatar={
           <Avatar
@@ -105,18 +115,22 @@ const PostCard = ({
           post.user_id._id !== user.id &&
           (isFollowing ? (
             <Typography
-              // variant="outlined"
-              // size="small"
-              sx={styles.unfollowBtn}
+              sx={{
+                ...styles.unfollowBtn,
+                px: { xs: 1, md: 2 },
+                fontSize: { xs: "12px", md: "14px" },
+              }}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
               Unfollow
             </Typography>
           ) : (
             <Typography
-              // variant="contained"
-              // size="small"
-              sx={styles.followBtn}
+              sx={{
+                ...styles.followBtn,
+                px: { xs: 1, md: 2 },
+                fontSize: { xs: "12px", md: "14px" },
+              }}
               onClick={() => onFollowToggle(post.user_id._id)}
             >
               Follow
@@ -130,21 +144,32 @@ const PostCard = ({
         height="400"
         image={post.images[0]}
         alt={post.description}
-        sx={{ cursor: "pointer", maxHeight: "505px" }}
+        sx={{
+          cursor: "pointer",
+          maxHeight: { xs: "calc(100vh - 200px)", md: "505px" },
+          objectFit: "contain",
+          bgcolor: "black",
+        }}
         onDoubleClick={handleLikeToggle}
       />
 
       <CardContent>
         <Box sx={styles.likeUndCommentContainer}>
           <Box sx={styles.likeUndCommentImgContainer}>
-            <IconButton onClick={handleLikeToggle}>
+            <IconButton
+              onClick={handleLikeToggle}
+              size={isMobile ? "small" : "medium"}
+            >
               {isLiked ? (
                 <FavoriteIcon sx={{ color: "red" }} />
               ) : (
                 <FavoriteBorderIcon />
               )}
             </IconButton>
-            <IconButton onClick={() => onModalOpen(post)}>
+            <IconButton
+              onClick={() => onModalOpen(post)}
+              size={isMobile ? "small" : "medium"}
+            >
               <ChatBubbleOutlineIcon />
             </IconButton>
           </Box>

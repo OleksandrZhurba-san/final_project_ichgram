@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, useTheme, useMediaQuery } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,6 +11,8 @@ import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
 import PostModal from "../../components/PostModal/PostModal";
 
 const ExplorePage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const dispatch = useDispatch();
   const { posts, isLoading } = useSelector((state) => state.posts);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,10 +61,25 @@ const ExplorePage = () => {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Grid container spacing={1}>
+    <Box
+      sx={{
+        p: { xs: 0, sm: 1, md: 2 },
+        width: "100%",
+        maxWidth: "100vw",
+        overflow: "hidden",
+        ml: { xs: 0, sm: 1 },
+      }}
+    >
+      <Grid container spacing={{ xs: 0, sm: 1, md: 1 }}>
         {randomPosts.map((post) => (
-          <Grid size={{ xs: 4 }} key={post._id}>
+          <Grid
+            size={{
+              xs: 4, // 3 columns on mobile
+              sm: 3, // 4 columns on tablet
+              md: 3, // 4 columns on desktop
+            }}
+            key={post._id}
+          >
             <Box
               onClick={() => handleModalOpen(post)}
               sx={{
@@ -72,6 +89,8 @@ const ExplorePage = () => {
                 "&:hover": {
                   opacity: 0.9,
                 },
+                transition: "opacity 0.2s ease",
+                border: "1px solid #dbdbdb",
               }}
             >
               <Box
@@ -92,7 +111,11 @@ const ExplorePage = () => {
         ))}
       </Grid>
 
-      <PostModal isOpenModal={isModalOpen} closeModal={closeModal} />
+      <PostModal
+        isOpenModal={isModalOpen}
+        closeModal={closeModal}
+        fullScreen={isMobile}
+      />
     </Box>
   );
 };

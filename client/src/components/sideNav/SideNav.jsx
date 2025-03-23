@@ -7,6 +7,8 @@ import {
   ListItemText,
   Dialog,
   Avatar,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -31,6 +33,8 @@ import { useDispatch } from "react-redux";
 import { fetchUserById } from "../../store/slices/userSlice";
 
 const SideNav = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [activeLink, setActiveLink] = useState("/home");
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -89,19 +93,27 @@ const SideNav = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        padding: "28px 0 0 25px",
-        maxWidth: "244px",
+        padding: isMobile ? "28px 0 0 0" : "28px 0 0 25px",
+        maxWidth: isMobile ? "60px" : "244px",
         width: "100%",
         borderRight: "1px solid #dbdbdb",
         gap: "24px",
+        transition: "all 0.3s ease",
       }}
     >
-      <Box
-        component="img"
-        src={Logo}
-        alt="logo"
-        sx={{ height: "55px", width: "97px", mb: 2 }}
-      />
+      {!isMobile && (
+        <Box
+          component="img"
+          src={Logo}
+          alt="logo"
+          sx={{
+            height: "55px",
+            width: "97px",
+            mb: 2,
+            transition: "all 0.3s ease",
+          }}
+        />
+      )}
 
       <List>
         {menuItems.map(
@@ -129,25 +141,42 @@ const SideNav = () => {
                 color: "#000000",
                 mb: 1,
                 width: "100%",
+                justifyContent: isMobile ? "center" : "flex-start",
+                padding: isMobile ? "8px" : "8px 16px",
               }}
             >
-              <ListItemIcon sx={{ minWidth: "auto", mr: 2 }}>
+              <ListItemIcon
+                sx={{
+                  minWidth: "auto",
+                  mr: isMobile ? 0 : 2,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 {label === "Profile" ? (
                   <Avatar
                     src={currentUser?.data?.image || User}
                     alt={currentUser?.data?.username}
-                    sx={{ width: 24, height: 24 }}
+                    sx={{
+                      width: isMobile ? 24 : 32,
+                      height: isMobile ? 24 : 32,
+                      transition: "all 0.3s ease",
+                    }}
                   />
                 ) : (
                   <Box
                     component="img"
                     src={activeLink === path ? activeIcon || icon : icon}
                     alt={label}
-                    sx={{ height: "24px", width: "24px" }}
+                    sx={{
+                      height: isMobile ? "24px" : "28px",
+                      width: isMobile ? "24px" : "28px",
+                      transition: "all 0.3s ease",
+                    }}
                   />
                 )}
               </ListItemIcon>
-              <ListItemText primary={label} />
+              {!isMobile && <ListItemText primary={label} />}
             </ListItemButton>
           )
         )}
@@ -163,6 +192,7 @@ const SideNav = () => {
       <Dialog
         open={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
+        fullScreen={isMobile}
       >
         {/* <SearchBar closeSearchModal={() => setIsSearchModalOpen(false)} /> */}
       </Dialog>

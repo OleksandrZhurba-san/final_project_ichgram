@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Typography, Avatar } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Container,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllPosts,
@@ -16,9 +22,10 @@ import { PostCard, PostModal, SkeletonPostCard } from "../../components";
 import { useNavigate } from "react-router-dom";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
 import { fetchPostLikeStatus } from "../../store/slices/likeSlice";
-import UserIcon from "../../assets/icons/user.svg";
 
 const Home = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { posts, isLoading: postsLoading } = useSelector(
@@ -43,7 +50,6 @@ const Home = () => {
     }
   }, [isAuthLoaded, user, dispatch, navigate]);
 
-  // Fetch like status for all posts when they are loaded
   useEffect(() => {
     const fetchLikes = async () => {
       if (posts?.length > 0) {
@@ -103,23 +109,69 @@ const Home = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, p: 4 }}>
-      {postsLoading || isLikesLoading
-        ? Array.from({ length: 4 }).map((_, idx) => (
-            <SkeletonPostCard key={idx} />
-          ))
-        : filteredPosts.map((post) => (
-            <PostCard
-              key={post._id}
-              post={post}
-              user={user}
-              isFollowing={followedIds.includes(post.user_id._id)}
-              onFollowToggle={handleFollowToggle}
-              onModalOpen={handleModalOpen}
-            />
-          ))}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+        p: { xs: 1, md: 4 },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: { xs: 2, md: 3 },
+          justifyContent: "center",
+          maxWidth: "1800px",
+          width: "100%",
+        }}
+      >
+        {postsLoading || isLikesLoading
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "450px",
+                    md: "500px",
+                  },
+                  maxWidth: "100%",
+                }}
+              >
+                <SkeletonPostCard />
+              </Box>
+            ))
+          : filteredPosts.map((post) => (
+              <Box
+                key={post._id}
+                sx={{
+                  width: {
+                    xs: "100%",
+                    sm: "450px",
+                    md: "500px",
+                  },
+                  maxWidth: "100%",
+                }}
+              >
+                <PostCard
+                  post={post}
+                  user={user}
+                  isFollowing={followedIds.includes(post.user_id._id)}
+                  onFollowToggle={handleFollowToggle}
+                  onModalOpen={handleModalOpen}
+                />
+              </Box>
+            ))}
+      </Box>
 
-      <PostModal isOpenModal={isOpenModal} closeModal={closeModal} />
+      <PostModal
+        isOpenModal={isOpenModal}
+        closeModal={closeModal}
+        fullScreen={isMobile}
+      />
     </Box>
   );
 };

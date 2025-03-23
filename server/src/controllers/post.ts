@@ -155,7 +155,10 @@ const getAllPosts = async (
   }
 
   try {
-    const posts = await Post.find().populate("user_id", "username image full_name");
+    const posts = await Post.find()
+      .populate("user_id", "username image full_name")
+      .populate({ path: "comments", select: "user_id text" })
+      .populate({ path: "likes", select: "user_id" });
     res.status(200).json({ message: "Posts", data: posts });
   } catch (error) {
     console.error(error);
@@ -163,4 +166,17 @@ const getAllPosts = async (
   }
 };
 
-export { createPost, getPost, updatePost, deletePost, getAllPosts };
+const getPostsByUserId = async (
+  req: Request,
+  res: Response<IApiResponse>) => {
+  try {
+    const posts = await Post.find({ user_id: req.params.userId })
+      .populate("user_id", "username image")
+      .sort({ created_at: -1 });
+    res.status(200).json({ message: "Posts: ", data: posts });
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export { createPost, getPost, updatePost, deletePost, getAllPosts, getPostsByUserId };

@@ -3,6 +3,25 @@ import { ICommentParams, ICreateCommentBody } from "../types/comment";
 import { IApiResponse } from "../types/common";
 import { Post, Comment } from "../models";
 
+const getAllCommentsByPostId = async (
+  req: Request,
+  res: Response<IApiResponse>
+): Promise<void> => {
+  const { postId } = req.params;
+
+  try {
+    const comments = await Comment.find({ ref_id: postId, ref_type: "Post" })
+      .populate("user_id", "username image")
+      .sort({ created_at: 1 })
+
+    res.status(201).json({ message: "Comments fetched: ", data: comments })
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
 const createComment = async (
   req: Request<ICommentParams, {}, ICreateCommentBody>,
   res: Response<IApiResponse>
@@ -85,4 +104,4 @@ const deleteComment = async (
   }
 };
 
-export { createComment, deleteComment };
+export { createComment, deleteComment, getAllCommentsByPostId };

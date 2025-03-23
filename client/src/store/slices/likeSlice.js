@@ -13,8 +13,10 @@ export const fetchPostLikeStatus = createAsyncThunk(
   async (postId, { rejectWithValue }) => {
     try {
       const response = await getLikesByPost(postId);
+      console.log("Fetch like status response:", response);
       return { postId, ...response.data };
     } catch (error) {
+      console.error("Error fetching like status:", error);
       return rejectWithValue(error.response?.data || "Failed to fetch likes");
     }
   }
@@ -25,8 +27,36 @@ export const togglePostLike = createAsyncThunk(
   async (postId, { rejectWithValue }) => {
     try {
       const response = await toggleLike(postId);
-      return { postId, liked: response.liked };
+      console.log("Toggle like response:", response);
+
+      // Check if response has the expected structure
+      if (!response || typeof response !== "object") {
+        console.error("Invalid response structure:", response);
+        throw new Error("Invalid response structure");
+      }
+
+      // Handle nested data structure
+      const { data } = response;
+      if (!data || typeof data !== "object") {
+        console.error("Invalid data structure:", data);
+        throw new Error("Invalid data structure");
+      }
+
+      const { liked, count } = data;
+      if (typeof liked !== "boolean" || typeof count !== "number") {
+        console.error("Invalid data types:", { liked, count });
+        throw new Error("Invalid data types");
+      }
+
+      const payload = {
+        postId,
+        liked,
+        count,
+      };
+      console.log("Returning payload:", payload);
+      return payload;
     } catch (error) {
+      console.error("Error toggling like:", error);
       return rejectWithValue(error.response?.data || "Failed to toggle like");
     }
   }
@@ -46,6 +76,7 @@ const likeSlice = createSlice({
       .addCase(fetchPostLikeStatus.fulfilled, (state, action) => {
         state.isLoading = false;
         const { postId, count, liked } = action.payload;
+        console.log("Updating like state for post:", postId, { count, liked });
         state.likesByPostId[postId] = { count, liked };
       })
       .addCase(fetchPostLikeStatus.rejected, (state, action) => {
@@ -53,16 +84,29 @@ const likeSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
+      .addCase(togglePostLike.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = "";
+      })
       .addCase(togglePostLike.fulfilled, (state, action) => {
-        const { postId, liked } = action.payload;
-        const current = state.likesByPostId[postId] || {
-          count: 0,
-          liked: false,
-        };
-        state.likesByPostId[postId] = {
-          count: current.count + (liked ? 1 : -1),
+        state.isLoading = false;
+        const { postId, count, liked } = action.payload;
+        console.log("Updating like state after toggle for post:", postId, {
+          count,
           liked,
-        };
+        });
+        console.log(
+          "Current state before update:",
+          state.likesByPostId[postId]
+        );
+        state.likesByPostId[postId] = { count, liked };
+        console.log("Updated state:", state.likesByPostId[postId]);
+      })
+      .addCase(togglePostLike.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
       });
   },
 });

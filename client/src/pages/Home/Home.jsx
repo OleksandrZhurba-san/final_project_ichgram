@@ -3,7 +3,6 @@ import { Box, Typography, Avatar } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllPosts,
-  togglePostLike,
   fetchPostById,
   clearSelectedPost,
 } from "../../store/slices/postsSlice";
@@ -16,6 +15,7 @@ import {
 import { PostCard, PostModal, SkeletonPostCard } from "../../components";
 import { useNavigate } from "react-router-dom";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
+import { fetchPostLikeStatus } from "../../store/slices/likeSlice";
 import UserIcon from "../../assets/icons/user.svg";
 
 const Home = () => {
@@ -28,7 +28,7 @@ const Home = () => {
   const { followings } = useSelector((state) => state.follow);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [error, setError] = useState(null);
+  const [isLikesLoading, setIsLikesLoading] = useState(true);
 
   const followedIds = followings?.map((f) => f._id) || [];
 
@@ -43,6 +43,26 @@ const Home = () => {
     }
   }, [isAuthLoaded, user, dispatch, navigate]);
 
+  // Fetch like status for all posts when they are loaded
+  useEffect(() => {
+    const fetchLikes = async () => {
+      if (posts?.length > 0) {
+        setIsLikesLoading(true);
+        try {
+          await Promise.all(
+            posts.map((post) => dispatch(fetchPostLikeStatus(post._id)))
+          );
+        } catch (error) {
+          console.error("Error fetching likes:", error);
+        } finally {
+          setIsLikesLoading(false);
+        }
+      }
+    };
+
+    fetchLikes();
+  }, [posts, dispatch]);
+
   const handleModalOpen = async (post) => {
     try {
       setIsOpenModal(true);
@@ -50,7 +70,6 @@ const Home = () => {
       dispatch(getAllCommentsByPost(post._id));
     } catch (error) {
       console.error("Error fetching post data:", error);
-      setError("Error loading post data");
       setIsOpenModal(false);
     }
   };
@@ -58,16 +77,6 @@ const Home = () => {
   const closeModal = () => {
     dispatch(clearSelectedPost());
     setIsOpenModal(false);
-  };
-
-  //TODO: cause re-render the whole Home page
-  const handleTogglePostLike = async (postId) => {
-    try {
-      await dispatch(togglePostLike(postId));
-    } catch (err) {
-      setError("Error toggling like:", err);
-      console.error(error);
-    }
   };
 
   const handleFollowToggle = async (postUserId) => {
@@ -80,7 +89,7 @@ const Home = () => {
       }
       dispatch(getUserFollowings(user.id));
     } catch (error) {
-      setError("Error updating follow status.", error);
+      console.error("Error updating follow status:", error);
     }
   };
 
@@ -95,7 +104,7 @@ const Home = () => {
 
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, p: 4 }}>
-      {postsLoading
+      {postsLoading || isLikesLoading
         ? Array.from({ length: 4 }).map((_, idx) => (
             <SkeletonPostCard key={idx} />
           ))
@@ -105,7 +114,6 @@ const Home = () => {
               post={post}
               user={user}
               isFollowing={followedIds.includes(post.user_id._id)}
-              onLikeToggle={handleTogglePostLike}
               onFollowToggle={handleFollowToggle}
               onModalOpen={handleModalOpen}
             />

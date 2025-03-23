@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -17,26 +17,53 @@ import { useNavigate } from "react-router-dom";
 import { timeAgo } from "../../utils/date.js";
 import UserIcon from "../../assets/icons/user.svg";
 import { styles } from "./PostCardStyles.js";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchPostLikeStatus,
+  togglePostLike,
+} from "../../store/slices/likeSlice";
 
 const PostCard = ({
   post,
   user,
   isFollowing,
-  onLikeToggle,
   onFollowToggle,
   onModalOpen,
   imageOnly = false,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isLiked = post.likes.some((like) => {
-    const likeUserId = like?.user_id?._id || like?.user_id;
-    return likeUserId === user.id || likeUserId === user._id;
-  });
+  const { likesByPostId } = useSelector((state) => state.likes);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      try {
+        console.log("Fetching like status for post:", post._id);
+        await dispatch(fetchPostLikeStatus(post._id)).unwrap();
+      } catch (error) {
+        console.error("Error fetching like status:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLikeStatus();
+  }, [dispatch, post._id]);
 
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const toggleDescription = () => {
     setShowFullDescription((prev) => !prev);
+  };
+
+  const handleLikeToggle = async () => {
+    try {
+      console.log("Toggling like for post:", post._id);
+      await dispatch(togglePostLike(post._id)).unwrap();
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
   if (imageOnly) {
@@ -58,6 +85,15 @@ const PostCard = ({
       />
     );
   }
+
+  const isLiked = likesByPostId[post._id]?.liked || false;
+  const likeCount = likesByPostId[post._id]?.count || 0;
+
+  console.log("PostCard render - post:", post._id, {
+    isLiked,
+    likeCount,
+    likesByPostId: likesByPostId[post._id],
+  });
 
   return (
     <Card sx={styles.postContainer}>
@@ -102,13 +138,13 @@ const PostCard = ({
         image={post.images[0]}
         alt={post.description}
         sx={{ cursor: "pointer", maxHeight: "505px" }}
-        onDoubleClick={() => onLikeToggle(post)}
+        onDoubleClick={handleLikeToggle}
       />
 
       <CardContent>
         <Box sx={styles.likeUndCommentContainer}>
           <Box sx={styles.likeUndCommentImgContainer}>
-            <IconButton onClick={() => onLikeToggle(post._id)}>
+            <IconButton onClick={handleLikeToggle}>
               {isLiked ? (
                 <FavoriteIcon sx={{ color: "red" }} />
               ) : (
@@ -120,7 +156,7 @@ const PostCard = ({
             </IconButton>
           </Box>
           <Typography sx={styles.likeCount}>
-            {post.likes_count || 0} likes
+            {isLoading ? "Loading..." : `${likeCount} likes`}
           </Typography>
         </Box>
 

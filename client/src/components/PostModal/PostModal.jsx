@@ -21,7 +21,10 @@ import {
   postComment,
   getAllCommentsByPost,
 } from "../../store/slices/commentsSlice";
-import { togglePostLike } from "../../store/slices/postsSlice";
+import {
+  fetchPostLikeStatus,
+  togglePostLike,
+} from "../../store/slices/likeSlice";
 import { timeAgo } from "../../utils/date";
 import { useNavigate } from "react-router-dom";
 
@@ -31,19 +34,18 @@ const PostModal = ({ closeModal, isOpenModal }) => {
   const { comments, isLoading: commentsLoading } = useSelector(
     (state) => state.comments
   );
-  const { user } = useSelector((state) => state.auth);
   const { selectedPost, isLoading: postLoading } = useSelector(
     (state) => state.posts
   );
+  const { likesByPostId } = useSelector((state) => state.likes);
 
   const [newComment, setNewComment] = useState("");
-  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
-    if (selectedPost?.likes) {
-      setIsLiked(selectedPost.likes.includes(user?._id));
+    if (selectedPost?._id) {
+      dispatch(fetchPostLikeStatus(selectedPost._id));
     }
-  }, [selectedPost?.likes, user?._id]);
+  }, [dispatch, selectedPost?._id]);
 
   useEffect(() => {
     if (selectedPost?._id && isOpenModal) {
@@ -66,8 +68,7 @@ const PostModal = ({ closeModal, isOpenModal }) => {
 
   const handleTogglePostLike = async () => {
     if (!selectedPost?._id) return;
-    dispatch(togglePostLike(selectedPost._id));
-    setIsLiked(!isLiked);
+    await dispatch(togglePostLike(selectedPost._id));
   };
 
   const handleUserClick = (userId) => {
@@ -76,6 +77,13 @@ const PostModal = ({ closeModal, isOpenModal }) => {
   };
 
   if (!isOpenModal) return null;
+
+  const isLiked = selectedPost?._id
+    ? likesByPostId[selectedPost._id]?.liked || false
+    : false;
+  const likeCount = selectedPost?._id
+    ? likesByPostId[selectedPost._id]?.count || 0
+    : 0;
 
   return (
     <Dialog
@@ -215,12 +223,12 @@ const PostModal = ({ closeModal, isOpenModal }) => {
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
+                  gap: 1,
                   mt: 2,
                 }}
               >
-                <Box sx={{ display: "flex", gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <IconButton onClick={handleTogglePostLike}>
                     {isLiked ? (
                       <FavoriteIcon color="error" />
@@ -232,7 +240,10 @@ const PostModal = ({ closeModal, isOpenModal }) => {
                     <ChatBubbleOutlineIcon />
                   </IconButton>
                 </Box>
-                <Typography variant="body2">
+                <Typography variant="body2" fontWeight={600}>
+                  {likeCount} likes
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
                   {timeAgo(selectedPost.created_at)}
                 </Typography>
               </Box>

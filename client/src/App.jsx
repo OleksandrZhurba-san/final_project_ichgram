@@ -1,7 +1,14 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 import { Box } from "@mui/material";
-import { Login, SignUp, Home, ProfilePage, EditProfile } from "./pages";
+import {
+  Login,
+  SignUp,
+  Home,
+  ProfilePage,
+  EditProfile,
+  ExplorePage,
+} from "./pages";
 import { ProtectedRoute, Layout } from "./components";
 import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
@@ -39,6 +46,7 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:userId" element={<ProfilePage />} />
             <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/explore" element={<ExplorePage />} />
           </Route>
         </Route>
 

@@ -82,14 +82,14 @@ const Profile = () => {
       <Grid container spacing={4}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Avatar
-            src={currentUser?.image || UserIcon}
-            alt={currentUser?.username}
+            src={currentUser?.data?.image || UserIcon}
+            alt={currentUser?.data?.username}
             sx={{ width: 150, height: 150 }}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 8 }}>
           <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="h6">{currentUser?.username}</Typography>
+            <Typography variant="h6">{currentUser?.data?.username}</Typography>
             {isOwnProfile ? (
               <>
                 <Button variant="outlined" onClick={handleEditProfile}>
@@ -105,16 +105,16 @@ const Profile = () => {
           <Box display="flex" gap={5} mt={2}>
             <Typography>{posts?.length || 0} posts</Typography>
             <Typography>{followers?.length || 0} followers</Typography>
-            <Typography>{followings?.length || 0}following</Typography>
+            <Typography>{followings?.length || 0} following</Typography>
           </Box>
 
-          {currentUser?.biography && (
-            <Typography mt={2}>{currentUser.biography}</Typography>
+          {currentUser?.data?.bio && (
+            <Typography mt={2}>{currentUser.data.bio}</Typography>
           )}
 
-          {currentUser?.webSite && (
-            <Link href={currentUser.webSite} target="_blank">
-              {currentUser.webSite}
+          {currentUser?.data?.website && (
+            <Link href={currentUser.data.website} target="_blank">
+              {currentUser.data.website}
             </Link>
           )}
         </Grid>

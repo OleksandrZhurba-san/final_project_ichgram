@@ -8,6 +8,7 @@ import {
   TextField,
   CircularProgress,
   IconButton,
+  Avatar,
 } from "@mui/material";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { useDispatch, useSelector } from "react-redux";
@@ -202,23 +203,10 @@ const CreatePostModal = ({ isOpen, onClose }) => {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                component="img"
+              <Avatar
                 src={currentUser?.data?.image || User}
-                alt="User"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  border: "3px solid #fff",
-                  boxShadow:
-                    "0 0 0 3px rgba(255, 105, 180, 0.9), 0 0 6px 1.5px rgba(255, 140, 0, 0.7), 0 0 10px -1.5px rgba(255, 105, 180, 0.6)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    borderColor: "#f477e4",
-                    boxShadow: "0 0 8px #f4b1db",
-                  },
-                }}
+                alt={currentUser?.data?.username}
+                sx={{ width: 40, height: 40 }}
               />
               <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                 {currentUser?.data?.username}

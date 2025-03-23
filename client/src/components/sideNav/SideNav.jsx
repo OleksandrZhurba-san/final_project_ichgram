@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   List,
@@ -6,6 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
   Dialog,
+  Avatar,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -26,12 +27,16 @@ import Search from "../../assets/icons/search_navbar.svg";
 import SearchFilled from "../../assets/icons/search_filled_navbar.svg";
 import User from "../../assets/icons/user.svg";
 import Logo from "../../assets/ichgram-logo.png";
+import { useDispatch } from "react-redux";
+import { fetchUserById } from "../../store/slices/userSlice";
 
 const SideNav = () => {
   const [activeLink, setActiveLink] = useState("/home");
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
+  const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const handleLinkClick = (link) => setActiveLink(link);
 
@@ -64,10 +69,20 @@ const SideNav = () => {
         activeIcon: NotificationFilled,
       },
       { label: "Create", path: "/create", icon: Create, isCreate: true },
-      { label: "Profile", path: "/profile", icon: user?.avatar || User },
+      {
+        label: "Profile",
+        path: "/profile",
+        icon: currentUser?.data?.image || User,
+      },
     ],
-    [user]
+    [currentUser?.data?.image]
   );
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchUserById(user.id));
+    }
+  }, [dispatch, user?.id]);
 
   return (
     <Box
@@ -117,12 +132,20 @@ const SideNav = () => {
               }}
             >
               <ListItemIcon sx={{ minWidth: "auto", mr: 2 }}>
-                <Box
-                  component="img"
-                  src={activeLink === path ? activeIcon || icon : icon}
-                  alt={label}
-                  sx={{ height: "24px", width: "24px" }}
-                />
+                {label === "Profile" ? (
+                  <Avatar
+                    src={currentUser?.data?.image || User}
+                    alt={currentUser?.data?.username}
+                    sx={{ width: 24, height: 24 }}
+                  />
+                ) : (
+                  <Box
+                    component="img"
+                    src={activeLink === path ? activeIcon || icon : icon}
+                    alt={label}
+                    sx={{ height: "24px", width: "24px" }}
+                  />
+                )}
               </ListItemIcon>
               <ListItemText primary={label} />
             </ListItemButton>

@@ -16,12 +16,12 @@ const EditProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
-  const { user: authUser } = useSelector((state) => state.auth);
+  // const { user: authUser } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     username: "",
+    bio: "",
     website: "",
-    about: "",
     image: null,
     imagePreview: null,
   });
@@ -31,7 +31,7 @@ const EditProfile = () => {
       setFormData({
         username: currentUser.data.username || "",
         website: currentUser.data.website || "",
-        about: currentUser.data.about || "",
+        bio: currentUser.data.bio || "",
         image: null,
         imagePreview: currentUser.data.image || User,
       });
@@ -41,6 +41,7 @@ const EditProfile = () => {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      console.log("Selected file:", file);
       setFormData((prev) => ({
         ...prev,
         image: file,
@@ -59,17 +60,35 @@ const EditProfile = () => {
 
   const handleSubmit = async () => {
     const formDataToSend = new FormData();
-    formDataToSend.append("username", formData.username);
-    formDataToSend.append("website", formData.website);
-    formDataToSend.append("about", formData.about);
-    if (formData.image) {
+
+    // Add the image first if it exists
+    if (formData.image instanceof File) {
+      console.log("Appending image file:", formData.image);
       formDataToSend.append("image", formData.image);
+    }
+
+    // Add other fields only if they have content
+    if (formData.username?.trim()) {
+      formDataToSend.append("username", formData.username.trim());
+    }
+
+    if (formData.bio?.trim()) {
+      formDataToSend.append("bio", formData.bio.trim());
+    }
+
+    if (formData.website?.trim()) {
+      formDataToSend.append("website", formData.website.trim());
+    }
+
+    // Debug: Log what's being sent
+    console.log("Form data being sent:");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(key, ":", value instanceof File ? "File" : value);
     }
 
     try {
       const resultAction = await dispatch(
         updateUserProfile({
-          userId: authUser.id,
           updatedData: formDataToSend,
         })
       ).unwrap();
@@ -79,6 +98,7 @@ const EditProfile = () => {
       }
     } catch (error) {
       console.error("Failed to update profile:", error);
+      // You might want to show an error message to the user here
     }
   };
 
@@ -164,15 +184,15 @@ const EditProfile = () => {
               fullWidth
               multiline
               rows={4}
-              name="about"
-              value={formData.about}
+              name="bio"
+              value={formData.bio}
               onChange={handleInputChange}
               variant="outlined"
               placeholder="Write something about yourself..."
               InputProps={{
                 sx: { "& .MuiOutlinedInput-input": { resize: "vertical" } },
               }}
-              helperText={`${formData.about.length}/150`}
+              helperText={`${formData.bio.length}/150`}
             />
           </Box>
 

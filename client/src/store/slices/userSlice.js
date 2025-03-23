@@ -23,9 +23,9 @@ export const fetchUserById = createAsyncThunk(
 
 export const updateUserProfile = createAsyncThunk(
   "user/update",
-  async ({ userId, updatedData }, { rejectWithValue }) => {
+  async ({ updatedData }, { rejectWithValue }) => {
     try {
-      const data = await updateUser(userId, updatedData);
+      const data = await updateUser(updatedData);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to update user");

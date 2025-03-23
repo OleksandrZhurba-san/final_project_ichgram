@@ -1,11 +1,31 @@
-import apiClient from "./api";
+import API from "./api";
+
+const USER_BASE_URL = "/user";
 
 export const getUserById = async (userId) => {
-  const response = await apiClient.get(`/user/${userId}`);
-  return response.data;
+  try {
+    const response = await API.get(`${USER_BASE_URL}/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || "Failed to fetch user";
+  }
 };
 
-export const updateUser = async (userId, data) => {
-  const response = await apiClient.put(`/user/${userId}`, data);
-  return response.data;
+export const updateUser = async (updatedData) => {
+  try {
+    const formData = new FormData();
+
+    for (let [key, value] of updatedData.entries()) {
+      formData.append(key, value);
+    }
+
+    const response = await API.patch(`${USER_BASE_URL}/update`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || "Failed to update user";
+  }
 };

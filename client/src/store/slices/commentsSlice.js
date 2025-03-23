@@ -15,10 +15,19 @@ const initialState = {
 
 export const postComment = createAsyncThunk(
   "comments/add",
-  async ({ postId, text }, { rejectWithValue }) => {
+  async ({ postId, text }, { rejectWithValue, getState }) => {
     try {
       const response = await addComment(postId, { text });
-      return response.data; // assuming response.data is the comment object
+      // Ensure the comment has user information
+      if (!response.data.user_id) {
+        const { user } = getState().auth;
+        response.data.user_id = {
+          _id: user._id,
+          username: user.username,
+          image: user.image,
+        };
+      }
+      return response.data;
     } catch (error) {
       return rejectWithValue(error);
     }

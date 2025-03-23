@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Avatar } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllPosts, togglePostLike } from "../../store/slices/postsSlice";
+import {
+  fetchAllPosts,
+  togglePostLike,
+  fetchPostById,
+  clearSelectedPost,
+} from "../../store/slices/postsSlice";
 import {
   getUserFollowings,
   getUserFollowers,
@@ -11,15 +16,17 @@ import {
 import { PostCard, PostModal, SkeletonPostCard } from "../../components";
 import { useNavigate } from "react-router-dom";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
+import UserIcon from "../../assets/icons/user.svg";
 
 const Home = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { posts, isLoading } = useSelector((state) => state.posts);
+  const { posts, isLoading: postsLoading } = useSelector(
+    (state) => state.posts
+  );
   const { user, isAuthLoaded } = useSelector((state) => state.auth);
   const { followings } = useSelector((state) => state.follow);
 
-  const [selectedPost, setSelectedPost] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [error, setError] = useState(null);
 
@@ -36,18 +43,21 @@ const Home = () => {
     }
   }, [isAuthLoaded, user, dispatch, navigate]);
 
-  const handleModalOpen = (post) => {
-    dispatch(getAllCommentsByPost(post._id));
-    setSelectedPost(post);
-    setIsOpenModal(true);
-    navigate(`post/${post._id}`);
+  const handleModalOpen = async (post) => {
+    try {
+      setIsOpenModal(true);
+      await dispatch(fetchPostById(post._id));
+      dispatch(getAllCommentsByPost(post._id));
+    } catch (error) {
+      console.error("Error fetching post data:", error);
+      setError("Error loading post data");
+      setIsOpenModal(false);
+    }
   };
 
-  const closeModal = async () => {
-    setSelectedPost(null);
+  const closeModal = () => {
+    dispatch(clearSelectedPost());
     setIsOpenModal(false);
-    // dispatch(fetchAllPosts());
-    navigate(-1);
   };
 
   //TODO: cause re-render the whole Home page
@@ -85,7 +95,7 @@ const Home = () => {
 
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, p: 4 }}>
-      {isLoading
+      {postsLoading
         ? Array.from({ length: 4 }).map((_, idx) => (
             <SkeletonPostCard key={idx} />
           ))
@@ -101,13 +111,7 @@ const Home = () => {
             />
           ))}
 
-      {selectedPost && (
-        <PostModal
-          post={selectedPost}
-          isOpenModal={isOpenModal}
-          closeModal={closeModal}
-        />
-      )}
+      <PostModal isOpenModal={isOpenModal} closeModal={closeModal} />
     </Box>
   );
 };

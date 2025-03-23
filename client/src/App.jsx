@@ -1,11 +1,10 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
-import "./App.css"
+import "./App.css";
 import { Box } from "@mui/material";
-import { Login, SignUp, Home } from "./pages"
-import { ProtectedRoute, PostModal, Layout } from "./components";
+import { Login, SignUp, Home, ProfilePage } from "./pages";
+import { ProtectedRoute, Layout } from "./components";
 import { isTokenExpired } from "./utils/auth.js";
 import { useEffect } from "react";
-
 
 const App = () => {
   const mainBoxStyle = {
@@ -31,10 +30,10 @@ const App = () => {
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/home" element={<Home />}>
-              {/* Nested route for modal inside /home */}
-              <Route path="post/:postId" element={<PostModal />} />
-            </Route>
+            <Route path="/home" element={<Home />} />
+            {/* Profile routes */}
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
           </Route>
         </Route>
 
@@ -45,4 +44,3 @@ const App = () => {
 };
 
 export default App;
-

@@ -40,6 +40,8 @@ const PostCard = ({
   };
 
   if (imageOnly) {
+    console.log("PostCard imageOnly post:", post);
+    console.log("PostCard imageOnly post.images:", post.images);
     return (
       <Box
         component="img"

@@ -64,3 +64,8 @@ export const unlikePost = async (postId) => {
   const response = await API.delete(`/like/${postId}`);
   return response.data;
 };
+
+export const fetchPostsByUser = async (userId) => {
+  const response = await API.get(`/post/user/${userId}`);
+  return response.data;
+};

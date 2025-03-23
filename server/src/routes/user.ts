@@ -6,6 +6,6 @@ import validateObjectId from "../middlewares/validateId";
 const router: Router = Router();
 
 router.get("/:id", authMiddleware, validateObjectId("id"), getUserProfile);
-router.put("/update", authMiddleware, updateUserProfilePicture, updateUserProfile);
+router.patch("/update", authMiddleware, updateUserProfilePicture, updateUserProfile);
 
 export default router;

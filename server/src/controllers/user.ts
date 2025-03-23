@@ -32,6 +32,8 @@ const updateUserProfile = async (
   res: Response<IApiResponse>
 ): Promise<void> => {
   const user = req.user;
+  console.log(req.body);
+  console.log(req.file);
 
   try {
     if (!user) {
@@ -50,14 +52,13 @@ const updateUserProfile = async (
     }
 
     if (username) {
-      const existingUser = await User.findOne({ username });
+      const existingUser = await User.findOne({ username, _id: { $ne: req.user.id } });
       if (existingUser) {
         res.status(404).json({ message: "This username is taken" });
         return;
       }
       user.name = username;
     }
-
     if (req.file) {
       const base64Img = req.file.buffer.toString("base64");
       user.image = `data:image/jpeg;base64,${base64Img}`;

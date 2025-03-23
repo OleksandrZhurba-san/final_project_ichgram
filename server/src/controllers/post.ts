@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ICreatePostBody, IPostParams, IUpdatePostBody } from "../types/post";
 import { IApiResponse } from "../types/common";
-import { Post, User } from "../models"
+import { Post, User } from "../models";
 import upload from "../utils/multer";
 import mongoose from "mongoose";
 
@@ -166,9 +166,7 @@ const getAllPosts = async (
   }
 };
 
-const getPostsByUserId = async (
-  req: Request,
-  res: Response<IApiResponse>) => {
+const getPostsByUserId = async (req: Request, res: Response<IApiResponse>) => {
   try {
     const posts = await Post.find({ user_id: req.params.userId })
       .populate("user_id", "username image")
@@ -179,4 +177,11 @@ const getPostsByUserId = async (
   }
 };
 
-export { createPost, getPost, updatePost, deletePost, getAllPosts, getPostsByUserId };
+export {
+  createPost,
+  getPost,
+  updatePost,
+  deletePost,
+  getAllPosts,
+  getPostsByUserId,
+};

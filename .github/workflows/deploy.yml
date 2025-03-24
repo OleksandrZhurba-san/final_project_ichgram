@@ -28,8 +28,15 @@ jobs:
         run: |
           ssh ec2-instance << 'EOF'
           cd ~/final_project_ichgram/server
-          git checkout main
-          git pull origin main
+          # Stash any local changes
+          git stash
+          # Reset to main branch
+          git fetch origin
+          git reset --hard origin/main
+          # Clean up any untracked files
+          git clean -fd
+          # Stop containers
           sudo docker-compose down
+          # Rebuild and start containers
           sudo docker-compose up -d --build
           EOF

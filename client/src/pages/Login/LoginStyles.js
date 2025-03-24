@@ -2,17 +2,21 @@ import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles(() => ({
   root: {
-    marginTop: "93px",
+    minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
     padding: "20px",
+    width: "100%",
   },
   container: {
     maxWidth: "900px",
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: "32px",
     width: "100%",
+    margin: "0 auto",
   },
   imageContainer: {
     display: "flex",
@@ -74,9 +78,12 @@ const useStyles = makeStyles(() => ({
     fontSize: "13px",
   },
   forgotPassword: {
+    display: "inline-block",
     marginTop: "10px",
     fontSize: "14px",
-    color: "#00376b",
+    // fontWeight: "bold",
+    fontFamily: "inherit",
+    color: "#0095F6",
     textDecoration: "none",
     "&:hover": {
       textDecoration: "underline",
@@ -87,11 +94,14 @@ const useStyles = makeStyles(() => ({
     padding: "15px",
     backgroundColor: "#fff",
     width: "100%",
+    maxWidth: "350px",
     textAlign: "center",
-    borderTop: "1px solid #dbdbdb",
+    borderRadius: "8px",
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
   },
   signupLink: {
     fontWeight: "bold",
+    fontFamily: "inherit",
     color: "#0095F6",
     textDecoration: "none",
     "&:hover": {

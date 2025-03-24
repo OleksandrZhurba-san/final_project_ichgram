@@ -5,14 +5,14 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Dialog,
+  Drawer,
   Avatar,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { CreatePostModal } from "../../components";
+import { CreatePostModal, SearchBar } from "../../components";
 // import SearchBar from "../searchBar";
 
 // Icons
@@ -54,7 +54,6 @@ const SideNav = () => {
       { label: "Home", path: "/home", icon: Home, activeIcon: HomeFilled },
       {
         label: "Search",
-        path: "/search",
         icon: Search,
         activeIcon: SearchFilled,
         isSearch: true,
@@ -77,7 +76,11 @@ const SideNav = () => {
         icon: Notification,
         activeIcon: NotificationFilled,
       },
-      { label: "Create", path: "/create", icon: Create, isCreate: true },
+      {
+        label: "Create",
+        icon: Create,
+        isCreate: true,
+      },
       {
         label: "Profile",
         path: "/profile",
@@ -98,6 +101,7 @@ const SideNav = () => {
         width: isMobile ? "auto" : 244,
         display: "flex",
         flexDirection: "column",
+        zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
       <Box
@@ -134,13 +138,18 @@ const SideNav = () => {
         {menuItems.map(
           ({ label, path, icon, activeIcon, isSearch, isCreate }) => (
             <ListItemButton
-              key={path}
-              component={NavLink}
-              to={path}
+              key={label}
+              {...(isSearch || isCreate
+                ? { component: "div" }
+                : { component: NavLink, to: path })}
               onClick={() => {
-                handleLinkClick(path);
-                if (isSearch) setIsSearchModalOpen(true);
-                if (isCreate) setIsCreatePostOpen(true);
+                if (isSearch) {
+                  setIsSearchModalOpen(true);
+                } else if (isCreate) {
+                  setIsCreatePostOpen(true);
+                } else {
+                  handleLinkClick(path);
+                }
               }}
               sx={{
                 borderRadius: 2,
@@ -194,14 +203,26 @@ const SideNav = () => {
         onClose={() => setIsCreatePostOpen(false)}
       />
 
-      {/* Search Modal */}
-      <Dialog
+      {/* Search Drawer */}
+      <Drawer
+        anchor="left"
         open={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
-        fullScreen={isMobile}
+        sx={{
+          "& .MuiDrawer-paper": {
+            width: isMobile ? "100%" : "400px",
+            marginLeft: isMobile ? 0 : "244px",
+            height: "100%",
+            boxSizing: "border-box",
+          },
+        }}
+        variant="temporary"
+        ModalProps={{
+          keepMounted: true, // Better mobile performance
+        }}
       >
-        {/* <SearchBar closeSearchModal={() => setIsSearchModalOpen(false)} /> */}
-      </Dialog>
+        <SearchBar closeSearchModal={() => setIsSearchModalOpen(false)} />
+      </Drawer>
     </Box>
   );
 };

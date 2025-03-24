@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Stack,
@@ -7,7 +7,12 @@ import {
   Typography,
   Divider,
   Link,
+  useTheme,
+  useMediaQuery,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../store/slices/authSlice.js";
@@ -19,9 +24,18 @@ import { NavLink } from "react-router-dom";
 
 const Login = () => {
   const classes = useStyles();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, isError, message } = useSelector((state) => state.auth);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const {
     register,
@@ -44,9 +58,11 @@ const Login = () => {
         spacing={4}
         className={classes.container}
       >
-        <Box className={classes.imageContainer}>
-          <img src={loginLogo} alt="Banner" className={classes.image} />
-        </Box>
+        {!isMobile && (
+          <Box className={classes.imageContainer}>
+            <img src={loginLogo} alt="Banner" className={classes.image} />
+          </Box>
+        )}
 
         <Box className={classes.formWrapper}>
           <Box className={classes.formContainer}>
@@ -64,13 +80,27 @@ const Login = () => {
               />
               <TextField
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 fullWidth
                 margin="normal"
                 variant="outlined"
                 {...register("password", { required: "Password is required" })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Button
                 type="submit"
@@ -89,9 +119,9 @@ const Login = () => {
               <Divider className={classes.divider} />
             </Box>
 
-            <Link href="#" className={classes.forgotPassword}>
+            <NavLink to="#" className={classes.forgotPassword}>
               Forgot password?
-            </Link>
+            </NavLink>
           </Box>
 
           <Box className={classes.signupContainer}>

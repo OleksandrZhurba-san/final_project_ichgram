@@ -29,3 +29,14 @@ export const updateUser = async (updatedData) => {
     throw error.response?.data || "Failed to update user";
   }
 };
+
+export const searchUsers = async (query) => {
+  try {
+    const response = await API.get(`/search/users`, {
+      params: { query },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || "Failed to search users";
+  }
+};

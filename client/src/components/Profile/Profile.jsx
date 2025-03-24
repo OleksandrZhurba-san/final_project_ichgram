@@ -112,206 +112,224 @@ const Profile = () => {
   return (
     <Box
       sx={{
-        p: { xs: 0, md: 4 },
+        display: "flex",
+        justifyContent: "center",
         width: "100%",
-        maxWidth: "100%",
       }}
     >
-      {/* Profile Header */}
       <Box
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: { xs: "center", md: "flex-start" },
-          gap: { xs: 2, md: 8 },
-          mb: { xs: 2, md: 4 },
-          p: { xs: 2, md: 0 },
+          maxWidth: "1196px",
+          width: "100%",
+          p: { xs: 0, md: 4 },
         }}
       >
-        {/* Avatar */}
+        {/* Profile Header */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "center",
-            width: { xs: "100%", md: "auto" },
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "center", md: "flex-start" },
+            gap: { xs: 2, md: 8 },
+            mb: { xs: 2, md: 4 },
+            p: { xs: 2, md: 0 },
           }}
         >
-          <Avatar
-            src={profileData?.data?.image || UserIcon}
-            alt={profileData?.data?.username}
-            sx={{
-              width: { xs: 86, md: 150 },
-              height: { xs: 86, md: 150 },
-            }}
-          />
-        </Box>
-
-        {/* Profile Info */}
-        <Box sx={{ flex: 1, width: { xs: "100%", md: "auto" } }}>
+          {/* Avatar */}
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              alignItems: { xs: "center", md: "flex-start" },
-              gap: 2,
-              mb: 2,
+              justifyContent: "center",
+              width: { xs: "100%", md: "auto" },
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: { xs: "center", md: "left" } }}
+            <Avatar
+              src={profileData?.data?.image || UserIcon}
+              alt={profileData?.data?.username}
+              sx={{
+                width: { xs: 86, md: 150 },
+                height: { xs: 86, md: 150 },
+              }}
+            />
+          </Box>
+
+          {/* Profile Info */}
+          <Box sx={{ flex: 1, width: { xs: "100%", md: "auto" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                alignItems: { xs: "center", md: "flex-start" },
+                gap: 2,
+                mb: 2,
+              }}
             >
-              {profileData?.data?.username}
-            </Typography>
-            {isOwnProfile ? (
-              <Box
+              <Typography
+                variant="h6"
+                sx={{ textAlign: { xs: "center", md: "left" } }}
+              >
+                {profileData?.data?.username}
+              </Typography>
+              {isOwnProfile ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    flexDirection: { xs: "column", md: "row" },
+                    width: { xs: "100%", md: "auto" },
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    onClick={handleEditProfile}
+                    fullWidth={isMobile}
+                  >
+                    Edit Profile
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handleLogout}
+                    fullWidth={isMobile}
+                  >
+                    Logout
+                  </Button>
+                </Box>
+              ) : (
+                <Button
+                  variant={isFollowing ? "contained" : "contained"}
+                  onClick={handleFollowToggle}
+                  fullWidth={isMobile}
+                  sx={{
+                    textTransform: "none",
+                    width: "132px",
+                    height: "32px",
+                    borderRadius: "8px",
+                    backgroundColor: isFollowing ? "#EFEFEF" : "#0095F6",
+                    color: isFollowing ? "#000" : "#fff",
+                    border: "none",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    minWidth: "132px",
+                    boxShadow: "none",
+                    "&:hover": {
+                      backgroundColor: isFollowing ? "#EFEFEF" : "#1877F2",
+                      border: "none",
+                      boxShadow: "none",
+                    },
+                  }}
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </Button>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                gap: { xs: 3, md: 5 },
+                justifyContent: { xs: "center", md: "flex-start" },
+                mb: 2,
+              }}
+            >
+              <Typography>{posts?.length || 0} posts</Typography>
+              <Typography>{followers?.length || 0} followers</Typography>
+              <Typography>{followings?.length || 0} following</Typography>
+            </Box>
+
+            {profileData?.data?.bio && (
+              <Typography
                 sx={{
-                  display: "flex",
-                  gap: 1,
-                  flexDirection: { xs: "column", md: "row" },
-                  width: { xs: "100%", md: "auto" },
+                  mt: 2,
+                  textAlign: { xs: "center", md: "left" },
                 }}
               >
-                <Button
-                  variant="outlined"
-                  onClick={handleEditProfile}
-                  fullWidth={isMobile}
-                >
-                  Edit Profile
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={handleLogout}
-                  fullWidth={isMobile}
-                >
-                  Logout
-                </Button>
-              </Box>
-            ) : (
-              <Button
-                variant={isFollowing ? "outlined" : "contained"}
-                onClick={handleFollowToggle}
-                fullWidth={isMobile}
+                {profileData.data.bio}
+              </Typography>
+            )}
+
+            {profileData?.data?.website && (
+              <Link
+                href={profileData.data.website}
+                target="_blank"
                 sx={{
-                  textTransform: "none",
-                  px: { xs: 4, md: 6 },
-                  py: { xs: 0.5, md: 1 },
-                  fontSize: { xs: "14px", md: "14px" },
-                  fontWeight: 600,
-                  minWidth: "auto",
+                  display: "block",
+                  textAlign: { xs: "center", md: "left" },
+                  mt: 1,
                 }}
               >
-                {isFollowing ? "Following" : "Follow"}
-              </Button>
+                {profileData.data.website}
+              </Link>
             )}
           </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              gap: { xs: 3, md: 5 },
-              justifyContent: { xs: "center", md: "flex-start" },
-              mb: 2,
-            }}
-          >
-            <Typography>{posts?.length || 0} posts</Typography>
-            <Typography>{followers?.length || 0} followers</Typography>
-            <Typography>{followings?.length || 0} following</Typography>
-          </Box>
-
-          {profileData?.data?.bio && (
-            <Typography
-              sx={{
-                mt: 2,
-                textAlign: { xs: "center", md: "left" },
-              }}
-            >
-              {profileData.data.bio}
-            </Typography>
-          )}
-
-          {profileData?.data?.website && (
-            <Link
-              href={profileData.data.website}
-              target="_blank"
-              sx={{
-                display: "block",
-                textAlign: { xs: "center", md: "left" },
-                mt: 1,
-              }}
-            >
-              {profileData.data.website}
-            </Link>
-          )}
         </Box>
-      </Box>
 
-      {/* Posts Grid */}
-      <Grid
-        container
-        spacing={{ xs: 0.5, md: 2 }}
-        sx={{
-          mt: { xs: 0, md: 4 },
-          mx: { xs: -0.25, md: 0 },
-          width: { xs: "calc(100% + 4px)", md: "100%" },
-        }}
-      >
-        {posts?.length > 0 ? (
-          posts.map((post) => (
-            <Grid
-              key={post._id}
-              size={{
-                xs: 4,
-                md: 4,
-              }}
-            >
-              <Box
-                sx={{
-                  position: "relative",
-                  paddingTop: "100%",
-                  cursor: "pointer",
-                  "&:hover": {
-                    opacity: 0.9,
-                  },
-                  transition: "opacity 0.2s ease",
+        {/* Posts Grid */}
+        <Grid
+          container
+          spacing={{ xs: 0.5, md: 2 }}
+          sx={{
+            mt: { xs: 0, md: 4 },
+            mx: { xs: -0.25, md: 0 },
+            width: { xs: "calc(100% + 4px)", md: "100%" },
+          }}
+        >
+          {posts?.length > 0 ? (
+            posts.map((post) => (
+              <Grid
+                key={post._id}
+                size={{
+                  xs: 4,
+                  md: 4,
                 }}
               >
                 <Box
-                  onClick={() => handleImageClick(post)}
-                  component="img"
-                  src={post.images[0]}
-                  alt="Post"
                   sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
+                    position: "relative",
+                    paddingTop: "100%",
+                    cursor: "pointer",
+                    "&:hover": {
+                      opacity: 0.9,
+                    },
+                    transition: "opacity 0.2s ease",
                   }}
-                />
-              </Box>
+                >
+                  <Box
+                    onClick={() => handleImageClick(post)}
+                    component="img"
+                    src={post.images[0]}
+                    alt="Post"
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
+              </Grid>
+            ))
+          ) : (
+            <Grid size={12}>
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  py: { xs: 2, md: 4 },
+                }}
+              >
+                No posts available
+              </Typography>
             </Grid>
-          ))
-        ) : (
-          <Grid size={12}>
-            <Typography
-              sx={{
-                textAlign: "center",
-                py: { xs: 2, md: 4 },
-              }}
-            >
-              No posts available
-            </Typography>
-          </Grid>
-        )}
-      </Grid>
+          )}
+        </Grid>
 
-      <PostModal
-        isOpenModal={isOpenModal}
-        closeModal={closeModal}
-        fullScreen={isMobile}
-      />
+        <PostModal
+          open={isOpenModal}
+          handleClose={closeModal}
+          fullScreen={isMobile}
+        />
+      </Box>
     </Box>
   );
 };

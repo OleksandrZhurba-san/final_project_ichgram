@@ -8,7 +8,8 @@ import {
   clearSelectedPost,
 } from "../../store/slices/postsSlice";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
-import PostModal from "../../components/PostModal/PostModal";
+// import PostModal from "../../components/PostModal/PostModal";
+import { PostModal } from "../../components";
 
 const ExplorePage = () => {
   const theme = useTheme();

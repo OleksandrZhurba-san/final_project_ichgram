@@ -28,7 +28,7 @@ import {
 import { timeAgo } from "../../utils/date";
 import { useNavigate } from "react-router-dom";
 
-const PostModal = ({ closeModal, isOpenModal }) => {
+const PostModal = ({ handleClose, open, fullScreen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { comments, isLoading: commentsLoading } = useSelector(
@@ -48,10 +48,10 @@ const PostModal = ({ closeModal, isOpenModal }) => {
   }, [dispatch, selectedPost?._id]);
 
   useEffect(() => {
-    if (selectedPost?._id && isOpenModal) {
+    if (selectedPost?._id && open) {
       dispatch(getAllCommentsByPost(selectedPost._id));
     }
-  }, [dispatch, selectedPost?._id, isOpenModal]);
+  }, [dispatch, selectedPost?._id, open]);
 
   const handleAddComment = async () => {
     if (!newComment.trim() || !selectedPost?._id) return;
@@ -76,7 +76,7 @@ const PostModal = ({ closeModal, isOpenModal }) => {
     navigate(`/profile/${userId}`);
   };
 
-  if (!isOpenModal) return null;
+  if (!open) return null;
 
   const isLiked = selectedPost?._id
     ? likesByPostId[selectedPost._id]?.liked || false
@@ -87,10 +87,11 @@ const PostModal = ({ closeModal, isOpenModal }) => {
 
   return (
     <Dialog
-      open={isOpenModal}
-      onClose={closeModal}
+      open={open}
+      onClose={handleClose}
       maxWidth="lg"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
           maxHeight: "90vh",

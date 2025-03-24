@@ -15,7 +15,7 @@ import User from "../../assets/icons/user.svg";
 const EditProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
+  const { loggedInUser } = useSelector((state) => state.user);
   // const { user: authUser } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
@@ -27,16 +27,16 @@ const EditProfile = () => {
   });
 
   useEffect(() => {
-    if (currentUser?.data) {
+    if (loggedInUser?.data) {
       setFormData({
-        username: currentUser.data.username || "",
-        website: currentUser.data.website || "",
-        bio: currentUser.data.bio || "",
+        username: loggedInUser.data.username || "",
+        website: loggedInUser.data.website || "",
+        bio: loggedInUser.data.bio || "",
         image: null,
-        imagePreview: currentUser.data.image || User,
+        imagePreview: loggedInUser.data.image || User,
       });
     }
-  }, [currentUser]);
+  }, [loggedInUser?.data]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -103,8 +103,21 @@ const EditProfile = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ py: 4 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+        py: 4,
+      }}
+    >
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "610px",
+        }}
+      >
         <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold" }}>
           Edit profile
         </Typography>
@@ -113,11 +126,13 @@ const EditProfile = () => {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            justifyContent: "center",
+            gap: 3,
             mb: 4,
-            bgcolor: "#f8f9fa",
-            p: 2,
-            borderRadius: 1,
+            bgcolor: "rgba(115, 115, 115, 0.098)",
+            p: 3,
+            borderRadius: "20px",
+            width: "100%",
           }}
         >
           <Avatar
@@ -125,16 +140,42 @@ const EditProfile = () => {
             alt="Profile"
             sx={{ width: 56, height: 56 }}
           />
-          <Box>
-            <Typography variant="h6" sx={{ mb: 0.5 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 0.5,
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              }}
+            >
               {formData.username}
             </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: "#737373",
+                fontSize: "14px",
+              }}
+            >
+              {formData.bio || "No bio yet"}
+            </Typography>
+          </Box>
+          <Box>
             <Button
               variant="contained"
               component="label"
               sx={{
-                bgcolor: "#1da1f2",
-                "&:hover": { bgcolor: "#1a91da" },
+                width: "114px",
+                height: "32px",
+                borderRadius: "8px",
+                bgcolor: "#0095F6",
+                color: "#fff",
+                textTransform: "none",
+                "&:hover": {
+                  bgcolor: "#1877F2",
+                },
               }}
             >
               New photo
@@ -148,9 +189,19 @@ const EditProfile = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            width: "100%",
+          }}
+        >
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ mb: 1, fontWeight: "bold", fontSize: "16px" }}
+            >
               Username
             </Typography>
             <TextField
@@ -159,11 +210,22 @@ const EditProfile = () => {
               value={formData.username}
               onChange={handleInputChange}
               variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                },
+                "& .MuiOutlinedInput-input": {
+                  fontSize: "14px",
+                },
+              }}
             />
           </Box>
 
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ mb: 1, fontWeight: "bold", fontSize: "16px" }}
+            >
               Website
             </Typography>
             <TextField
@@ -173,11 +235,22 @@ const EditProfile = () => {
               onChange={handleInputChange}
               variant="outlined"
               placeholder="bit.ly/3rpilbh"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                },
+                "& .MuiOutlinedInput-input": {
+                  fontSize: "14px",
+                },
+              }}
             />
           </Box>
 
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ mb: 1, fontWeight: "bold", fontSize: "16px" }}
+            >
               About
             </Typography>
             <TextField
@@ -189,6 +262,14 @@ const EditProfile = () => {
               onChange={handleInputChange}
               variant="outlined"
               placeholder="Write something about yourself..."
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                },
+                "& .MuiOutlinedInput-input": {
+                  fontSize: "14px",
+                },
+              }}
               InputProps={{
                 sx: { "& .MuiOutlinedInput-input": { resize: "vertical" } },
               }}
@@ -201,17 +282,21 @@ const EditProfile = () => {
             fullWidth
             onClick={handleSubmit}
             sx={{
-              mt: 2,
-              bgcolor: "#1da1f2",
-              "&:hover": { bgcolor: "#1a91da" },
-              py: 1.5,
+              height: "32px",
+              borderRadius: "8px",
+              bgcolor: "#0095F6",
+              color: "#fff",
+              textTransform: "none",
+              "&:hover": {
+                bgcolor: "#1877F2",
+              },
             }}
           >
             Save
           </Button>
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

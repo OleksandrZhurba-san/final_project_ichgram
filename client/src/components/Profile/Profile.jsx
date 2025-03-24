@@ -52,14 +52,15 @@ const Profile = () => {
   useEffect(() => {
     const targetUserId = userId || user?.id;
     if (targetUserId) {
-      if (!isOwnProfile) {
-        dispatch(fetchUserById(targetUserId));
-      }
       dispatch(getPostsByUser(targetUserId));
       dispatch(getUserFollowers(targetUserId));
       dispatch(getUserFollowings(user.id));
+
+      if (!isOwnProfile) {
+        dispatch(fetchUserById(targetUserId));
+      }
     }
-  }, [dispatch, userId, user, isOwnProfile]);
+  }, [dispatch, userId, user?.id, isOwnProfile]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -85,12 +86,11 @@ const Profile = () => {
 
   const handleImageClick = async (post) => {
     try {
-      setIsOpenModal(true);
       await dispatch(fetchPostById(post._id));
       dispatch(getAllCommentsByPost(post._id));
+      setIsOpenModal(true);
     } catch (error) {
       console.error("Error fetching post data:", error);
-      setIsOpenModal(false);
     }
   };
 

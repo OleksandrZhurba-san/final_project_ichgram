@@ -121,7 +121,11 @@ const SideNav = () => {
             component="img"
             src={Logo}
             alt="Logo"
-            sx={{ height: "32px", width: "103px" }}
+            sx={{
+              height: "54px",
+              width: "97px",
+              objectFit: "contain",
+            }}
           />
         )}
         {isMobile && (
@@ -129,7 +133,11 @@ const SideNav = () => {
             component="img"
             src={Logo}
             alt="Logo"
-            sx={{ height: "24px", width: "24px" }}
+            sx={{
+              height: "32px",
+              width: "32px",
+              objectFit: "contain",
+            }}
           />
         )}
       </Box>

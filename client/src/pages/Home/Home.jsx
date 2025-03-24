@@ -122,9 +122,9 @@ const Home = () => {
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          gap: { xs: 2, md: 3 },
+          gap: "39px",
           justifyContent: "center",
-          maxWidth: "1800px",
+          maxWidth: "1200px", // will fit 2 posts in a row
           width: "100%",
         }}
       >
@@ -135,8 +135,8 @@ const Home = () => {
                 sx={{
                   width: {
                     xs: "100%",
-                    sm: "450px",
-                    md: "500px",
+                    sm: "404px",
+                    md: "404px",
                   },
                   maxWidth: "100%",
                 }}
@@ -150,8 +150,8 @@ const Home = () => {
                 sx={{
                   width: {
                     xs: "100%",
-                    sm: "450px",
-                    md: "500px",
+                    sm: "404px",
+                    md: "404px",
                   },
                   maxWidth: "100%",
                 }}

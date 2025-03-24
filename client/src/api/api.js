@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseURL =
   import.meta.env.VITE_API_BASE_URL ||
-  "http://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com:4000/api";
+  "https://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com/api";
 
 const API = axios.create({
   baseURL: baseURL,

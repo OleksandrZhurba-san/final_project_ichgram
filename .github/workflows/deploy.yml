@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - production
+      - main
 
 jobs:
   deploy:
@@ -28,8 +28,8 @@ jobs:
         run: |
           ssh ec2-instance << 'EOF'
           cd ~/final_project_ichgram/server
-          git checkout production
-          git pull origin production
+          git checkout main
+          git pull origin main
           sudo docker-compose down
           sudo docker-compose up -d --build
           EOF

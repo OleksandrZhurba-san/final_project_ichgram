@@ -2,3 +2,4 @@ dist
 node_modules
 **/.env
 **/package-lock.json
+docker_and_cd_config.patch

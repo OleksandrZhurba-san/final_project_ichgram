@@ -1,0 +1,157 @@
+Subject: [PATCH] docker and cd config
+---
+Index: server/.env_example
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server/.env_example b/server/.env_example
+--- a/server/.env_example	(revision 514e810effed1d86be6d2b2063c5985684728907)
++++ b/server/.env_example	(date 1741947331395)
+@@ -1,4 +1,4 @@
+-PORT=
++PORT=4000
+ JWT_SECRET=
+ JWT_EXPIRATION= 
+ MONGO_URI=
+Index: server/package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server/package.json b/server/package.json
+--- a/server/package.json	(revision 514e810effed1d86be6d2b2063c5985684728907)
++++ b/server/package.json	(date 1741947180103)
+@@ -3,7 +3,9 @@
+   "version": "1.0.0",
+   "main": "index.js",
+   "scripts": {
+-    "dev": "nodemon ./src/app.ts"
++    "dev": "nodemon ./src/app.ts",
++    "prod": "node ./dist/app.js",
++    "build": "npx tsc"
+   },
+   "keywords": [],
+   "author": "",
+Index: .github/workflows/deploy.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+new file mode 100644
+--- /dev/null	(date 1741947736934)
++++ b/.github/workflows/deploy.yml	(date 1741947736934)
+@@ -0,0 +1,35 @@
++name: Deploy to EC2
++
++on:
++  push:
++    branches:
++      - production
++
++jobs:
++  deploy:
++    runs-on: ubuntu-latest
++
++    steps:
++      - name: Checkout repository
++        uses: actions/checkout@v3
++
++      - name: Setup SSH
++        run: |
++          mkdir -p ~/.ssh
++          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
++          chmod 600 ~/.ssh/id_rsa
++          echo "Host ec2-instance
++                HostName ${{ secrets.EC2_HOST }}
++                User ${{ secrets.EC2_USER }}
++                IdentityFile ~/.ssh/id_rsa
++                StrictHostKeyChecking no" > ~/.ssh/config
++
++      - name: Deploy application
++        run: |
++          ssh ec2-instance << 'EOF'
++          cd ~/final_project_ichgram/server
++          git checkout production
++          git pull origin production
++          sudo docker-compose down
++          sudo docker-compose up -d --build
++          EOF
+\ No newline at end of file
+Index: server/.dockerignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server/.dockerignore b/server/.dockerignore
+new file mode 100644
+--- /dev/null	(date 1741947225079)
++++ b/server/.dockerignore	(date 1741947225079)
+@@ -0,0 +1,3 @@
++/dist
++/node_modules
++.env
+\ No newline at end of file
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 514e810effed1d86be6d2b2063c5985684728907)
++++ b/.gitignore	(date 1741947225083)
+@@ -1,3 +1,4 @@
++dist
+ node_modules
+ **/.env
+ **/package-lock.json
+Index: server/docker-compose.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server/docker-compose.yml b/server/docker-compose.yml
+new file mode 100644
+--- /dev/null	(date 1741947401995)
++++ b/server/docker-compose.yml	(date 1741947401995)
+@@ -0,0 +1,17 @@
++version: '3.8'
++
++services:
++  server:
++    build:
++      context: .
++    env_file:
++      - .env
++    ports:
++      - "4000:4000"
++    networks:
++      - ichgram_network
++
++networks:
++  ichgram_network:
++    driver: bridge
++
+Index: server/Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/server/Dockerfile b/server/Dockerfile
+new file mode 100644
+--- /dev/null	(date 1741947165119)
++++ b/server/Dockerfile	(date 1741947165119)
+@@ -0,0 +1,12 @@
++FROM node:22-alpine
++
++WORKDIR /app
++
++COPY package*.json ./
++RUN npm i
++
++COPY . .
++
++RUN npm run build
++
++CMD ["npm", "run", "prod"]

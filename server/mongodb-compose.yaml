@@ -1,0 +1,16 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo-prod
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 
+      MONGO_INITDB_ROOT_PASSWORD: 
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
+volumes:
+  mongodemo:
+

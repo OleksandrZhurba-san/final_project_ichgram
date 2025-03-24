@@ -179,16 +179,48 @@ const Profile = () => {
                   }}
                 >
                   <Button
-                    variant="outlined"
                     onClick={handleEditProfile}
                     fullWidth={isMobile}
+                    sx={{
+                      width: "132px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      backgroundColor: "#EFEFEF",
+                      color: "#000",
+                      textTransform: "none",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      border: "none",
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "#DBDBDB",
+                        border: "none",
+                        boxShadow: "none",
+                      },
+                    }}
                   >
                     Edit Profile
                   </Button>
                   <Button
-                    variant="outlined"
                     onClick={handleLogout}
                     fullWidth={isMobile}
+                    sx={{
+                      width: "132px",
+                      height: "32px",
+                      borderRadius: "8px",
+                      backgroundColor: "#EFEFEF",
+                      color: "#000",
+                      textTransform: "none",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      border: "none",
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "#DBDBDB",
+                        border: "none",
+                        boxShadow: "none",
+                      },
+                    }}
                   >
                     Logout
                   </Button>

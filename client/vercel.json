@@ -33,5 +33,10 @@
       "main": true,
       "production": false
     }
+  },
+  "env": {
+    "VITE_API_URL": "https://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com:4000",
+    "VITE_SOCKET_URL": "wss://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com:4000",
+    "VITE_BASE_API_URL": "https://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com:4000/api"
   }
 }

@@ -21,54 +21,53 @@ import {
   postComment,
   getAllCommentsByPost,
 } from "../../store/slices/commentsSlice";
-import {
-  fetchPostLikeStatus,
-  togglePostLike,
-} from "../../store/slices/likeSlice";
+import { togglePostLike } from "../../store/slices/likeSlice";
 import { timeAgo } from "../../utils/date";
 import { useNavigate } from "react-router-dom";
 
-const PostModal = ({ handleClose, open, fullScreen }) => {
+const PostModal = ({
+  handleClose,
+  open,
+  fullScreen,
+  modalId = "default-modal",
+  post,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { comments, isLoading: commentsLoading } = useSelector(
     (state) => state.comments
-  );
-  const { selectedPost, isLoading: postLoading } = useSelector(
-    (state) => state.posts
   );
   const { likesByPostId } = useSelector((state) => state.likes);
 
   const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
-    if (selectedPost?._id) {
-      dispatch(fetchPostLikeStatus(selectedPost._id));
+    if (!open) {
+      setNewComment("");
     }
-  }, [dispatch, selectedPost?._id]);
-
-  useEffect(() => {
-    if (selectedPost?._id && open) {
-      dispatch(getAllCommentsByPost(selectedPost._id));
-    }
-  }, [dispatch, selectedPost?._id, open]);
+  }, [open]);
 
   const handleAddComment = async () => {
-    if (!newComment.trim() || !selectedPost?._id) return;
+    if (!newComment.trim() || !post?._id) return;
 
-    const resultAction = await dispatch(
-      postComment({ postId: selectedPost._id, text: newComment })
-    );
-
-    if (postComment.fulfilled.match(resultAction)) {
+    try {
+      await dispatch(
+        postComment({ postId: post._id, text: newComment })
+      ).unwrap();
       setNewComment("");
-      dispatch(getAllCommentsByPost(selectedPost._id));
+      dispatch(getAllCommentsByPost(post._id));
+    } catch (error) {
+      console.error("Error posting comment:", error);
     }
   };
 
   const handleTogglePostLike = async () => {
-    if (!selectedPost?._id) return;
-    await dispatch(togglePostLike(selectedPost._id));
+    if (!post?._id) return;
+    try {
+      await dispatch(togglePostLike(post._id));
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
   const handleUserClick = (userId) => {
@@ -78,12 +77,8 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
 
   if (!open) return null;
 
-  const isLiked = selectedPost?._id
-    ? likesByPostId[selectedPost._id]?.liked || false
-    : false;
-  const likeCount = selectedPost?._id
-    ? likesByPostId[selectedPost._id]?.count || 0
-    : 0;
+  const isLiked = post?._id ? likesByPostId[post._id]?.liked || false : false;
+  const likeCount = post?._id ? likesByPostId[post._id]?.count || 0 : 0;
 
   return (
     <Dialog
@@ -100,20 +95,10 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
           width: "100%",
         },
       }}
+      id={modalId}
     >
       <DialogContent sx={{ display: "flex", p: 0, height: "100%" }}>
-        {postLoading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        ) : !selectedPost ? (
+        {!post ? (
           <Box
             sx={{
               display: "flex",
@@ -139,7 +124,7 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
               }}
             >
               <img
-                src={selectedPost.images[0]}
+                src={post.images[0]}
                 alt="Post"
                 style={{
                   maxWidth: "100%",
@@ -170,13 +155,13 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Avatar
-                    src={selectedPost.user_id?.image || UserIcon}
-                    alt={selectedPost.user_id?.username}
+                    src={post.user_id?.image || UserIcon}
+                    alt={post.user_id?.username}
                     sx={{ width: 40, height: 40, cursor: "pointer" }}
-                    onClick={() => handleUserClick(selectedPost.user_id?._id)}
+                    onClick={() => handleUserClick(post.user_id?._id)}
                   />
                   <Typography variant="subtitle1" fontWeight={600}>
-                    {selectedPost.user_id?.username}
+                    {post.user_id?.username}
                   </Typography>
                 </Box>
                 <IconButton>
@@ -187,7 +172,7 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
               {/* Comments Section */}
               <Box sx={{ flex: 1, overflowY: "auto", my: 1, pr: 1 }}>
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  {selectedPost.description}
+                  {post.description}
                 </Typography>
                 {commentsLoading ? (
                   <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
@@ -247,7 +232,7 @@ const PostModal = ({ handleClose, open, fullScreen }) => {
                   {likeCount} likes
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {timeAgo(selectedPost.created_at)}
+                  {timeAgo(post.created_at)}
                 </Typography>
               </Box>
 

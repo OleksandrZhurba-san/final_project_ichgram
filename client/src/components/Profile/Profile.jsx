@@ -19,11 +19,7 @@ import {
   addFollowing,
   deleteFollowing,
 } from "../../store/slices/followSlice";
-import {
-  getPostsByUser,
-  fetchPostById,
-  clearSelectedPost,
-} from "../../store/slices/postsSlice";
+import { getPostsByUser } from "../../store/slices/postsSlice";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
 import { logout } from "../../store/slices/authSlice";
 import PostModal from "../PostModal/PostModal";
@@ -45,6 +41,7 @@ const Profile = () => {
 
   const isOwnProfile = !userId || userId === user?.id;
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
   const isFollowing = followings?.some(
     (following) => following._id === currentUser?.data?._id
   );
@@ -86,17 +83,19 @@ const Profile = () => {
 
   const handleImageClick = async (post) => {
     try {
-      await dispatch(fetchPostById(post._id));
-      dispatch(getAllCommentsByPost(post._id));
+      setSelectedPost(post);
       setIsOpenModal(true);
+      await dispatch(getAllCommentsByPost(post._id));
     } catch (error) {
       console.error("Error fetching post data:", error);
+      setIsOpenModal(false);
+      setSelectedPost(null);
     }
   };
 
   const closeModal = () => {
-    dispatch(clearSelectedPost());
     setIsOpenModal(false);
+    setSelectedPost(null);
   };
 
   if (
@@ -328,6 +327,8 @@ const Profile = () => {
           open={isOpenModal}
           handleClose={closeModal}
           fullScreen={isMobile}
+          modalId="profile-post-modal"
+          post={selectedPost}
         />
       </Box>
     </Box>

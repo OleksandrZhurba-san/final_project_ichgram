@@ -79,14 +79,13 @@ const PostCard = ({
         alt={post.description}
         onClick={() => onModalOpen(post)}
         sx={{
-          width: "100%",
-          height: "100%",
-          maxWidth: "300px",
-          maxHeight: "400px",
+          maxWidth: "316px",
+          maxHeight: "316px",
           objectFit: "cover",
           borderRadius: 2,
           cursor: "pointer",
           display: "block",
+          flexShrink: 0,
         }}
       />
     );

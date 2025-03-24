@@ -7,11 +7,7 @@ import {
   Container,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAllPosts,
-  fetchPostById,
-  clearSelectedPost,
-} from "../../store/slices/postsSlice";
+import { fetchAllPosts } from "../../store/slices/postsSlice";
 import {
   getUserFollowings,
   getUserFollowers,
@@ -36,6 +32,7 @@ const Home = () => {
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isLikesLoading, setIsLikesLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   const followedIds = followings?.map((f) => f._id) || [];
 
@@ -71,18 +68,20 @@ const Home = () => {
 
   const handleModalOpen = async (post) => {
     try {
+      setSelectedPost(post);
       setIsOpenModal(true);
-      await dispatch(fetchPostById(post._id));
-      dispatch(getAllCommentsByPost(post._id));
+      // Only fetch comments
+      await dispatch(getAllCommentsByPost(post._id));
     } catch (error) {
       console.error("Error fetching post data:", error);
       setIsOpenModal(false);
+      setSelectedPost(null);
     }
   };
 
   const closeModal = () => {
-    dispatch(clearSelectedPost());
     setIsOpenModal(false);
+    setSelectedPost(null);
   };
 
   const handleFollowToggle = async (postUserId) => {
@@ -168,9 +167,11 @@ const Home = () => {
       </Box>
 
       <PostModal
-        isOpenModal={isOpenModal}
-        closeModal={closeModal}
+        open={isOpenModal}
+        handleClose={closeModal}
         fullScreen={isMobile}
+        modalId="home-post-modal"
+        post={selectedPost}
       />
     </Box>
   );

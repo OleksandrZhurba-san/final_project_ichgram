@@ -2,13 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, CircularProgress, useTheme, useMediaQuery } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAllPosts,
-  fetchPostById,
-  clearSelectedPost,
-} from "../../store/slices/postsSlice";
+import { fetchAllPosts } from "../../store/slices/postsSlice";
 import { getAllCommentsByPost } from "../../store/slices/commentsSlice";
-// import PostModal from "../../components/PostModal/PostModal";
 import { PostModal } from "../../components";
 
 const ExplorePage = () => {
@@ -17,6 +12,7 @@ const ExplorePage = () => {
   const dispatch = useDispatch();
   const { posts, isLoading } = useSelector((state) => state.posts);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
   const [randomPosts, setRandomPosts] = useState([]);
 
   useEffect(() => {
@@ -32,18 +28,20 @@ const ExplorePage = () => {
 
   const handleModalOpen = async (post) => {
     try {
+      setSelectedPost(post);
       setIsModalOpen(true);
-      await dispatch(fetchPostById(post._id));
-      dispatch(getAllCommentsByPost(post._id));
+      // Only fetch comments
+      await dispatch(getAllCommentsByPost(post._id));
     } catch (error) {
       console.error("Error fetching post data:", error);
       setIsModalOpen(false);
+      setSelectedPost(null);
     }
   };
 
   const closeModal = () => {
-    dispatch(clearSelectedPost());
     setIsModalOpen(false);
+    setSelectedPost(null);
   };
 
   if (isLoading) {
@@ -66,7 +64,8 @@ const ExplorePage = () => {
       sx={{
         p: { xs: 0, sm: 1, md: 2 },
         width: "100%",
-        maxWidth: "100vw",
+        maxWidth: "1440px",
+        margin: "0 auto",
         overflow: "hidden",
         ml: { xs: 0, sm: 1 },
       }}
@@ -113,9 +112,11 @@ const ExplorePage = () => {
       </Grid>
 
       <PostModal
-        isOpenModal={isModalOpen}
-        closeModal={closeModal}
+        open={isModalOpen}
+        handleClose={closeModal}
         fullScreen={isMobile}
+        modalId="explore-post-modal"
+        post={selectedPost}
       />
     </Box>
   );

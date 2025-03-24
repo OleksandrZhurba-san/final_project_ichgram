@@ -11,7 +11,7 @@ const Layout = () => {
     <Box
       sx={{
         display: "flex",
-        height: "100vh",
+        height: "100%",
         width: "100%",
       }}
     >
@@ -25,11 +25,13 @@ const Layout = () => {
         <SideNav />
       </Box>
       <Box
+        component="main"
         sx={{
           flex: 1,
           overflowY: "auto",
           padding: { xs: "12px", md: "20px" },
           maxWidth: { xs: `calc(100% - 60px)`, md: `calc(100% - 244px)` },
+          height: "100%",
         }}
       >
         <Outlet />

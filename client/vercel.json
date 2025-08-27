@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "production": false
+    }
+  },
+  "env": {
+    "VITE_API_URL": "https://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com",
+    "VITE_SOCKET_URL": "wss://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com",
+    "VITE_BASE_API_URL": "https://ec2-3-66-218-103.eu-central-1.compute.amazonaws.com/api"
+  }
+}

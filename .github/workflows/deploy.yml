@@ -1,0 +1,42 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "Host ec2-instance
+                HostName ${{ secrets.EC2_HOST }}
+                User ${{ secrets.EC2_USER }}
+                IdentityFile ~/.ssh/id_rsa
+                StrictHostKeyChecking no" > ~/.ssh/config
+
+      - name: Deploy application
+        run: |
+          ssh ec2-instance << 'EOF'
+          cd ~/final_project_ichgram/server
+          # Stash any local changes
+          git stash
+          # Reset to main branch
+          git fetch origin
+          git reset --hard origin/main
+          # Clean up any untracked files
+          git clean -fd
+          # Stop containers
+          sudo docker-compose down
+          # Rebuild and start containers
+          sudo docker-compose up -d --build
+          EOF

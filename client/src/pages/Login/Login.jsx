@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Stack,
@@ -10,21 +10,21 @@ import {
   useMediaQuery,
   InputAdornment,
   IconButton,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../store/slices/authSlice.js";
-import { useNavigate } from "react-router-dom";
-import loginLogo from "../../assets/login-banner.png";
-import ichgramLogo from "../../assets/ichgram-logo.png";
-import useStyles from "./LoginStyles.js";
-import { NavLink } from "react-router-dom";
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../store/slices/authSlice.js';
+import { useNavigate } from 'react-router-dom';
+import loginLogo from '../../assets/login-banner.png';
+import ichgramLogo from '../../assets/ichgram-logo.png';
+import useStyles from './LoginStyles.js';
+import { NavLink } from 'react-router-dom';
 
 const Login = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, isError, message } = useSelector((state) => state.auth);
@@ -44,8 +44,8 @@ const Login = () => {
 
   const onSubmit = (data) => {
     dispatch(loginUser(data)).then((result) => {
-      if (result.meta.requestStatus === "fulfilled") {
-        navigate("/home");
+      if (result.meta.requestStatus === 'fulfilled') {
+        navigate('/home');
       }
     });
   };
@@ -53,7 +53,7 @@ const Login = () => {
   return (
     <Box data-testid="sign-up-container" className={classes.root}>
       <Stack
-        direction={{ xs: "column", md: "row" }}
+        direction={{ xs: 'column', md: 'row' }}
         spacing={4}
         className={classes.container}
       >
@@ -73,17 +73,17 @@ const Login = () => {
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                {...register("login", { required: "Email is required" })}
+                {...register('login', { required: 'Email is required' })}
                 error={!!errors.login}
                 helperText={errors.login?.message}
               />
               <TextField
                 label="Password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 margin="normal"
                 variant="outlined"
-                {...register("password", { required: "Password is required" })}
+                {...register('password', { required: 'Password is required' })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 InputProps={{
@@ -108,7 +108,7 @@ const Login = () => {
                 className={classes.loginButton}
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Log in"}
+                {isLoading ? 'Logging in...' : 'Log in'}
               </Button>
             </form>
 
@@ -125,7 +125,7 @@ const Login = () => {
 
           <Box className={classes.signupContainer}>
             <Typography>
-              Don't have an account?{" "}
+              Don't have an account?{' '}
               <NavLink to="/sign-up" className={classes.signupLink}>
                 Sign up
               </NavLink>

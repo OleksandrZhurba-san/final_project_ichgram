@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('home opens and renders smoething meaningful', async ({ page }) => {
+test('home opens and renders something meaningful', async ({ page }) => {
   const res = await page.goto('/login');
   expect(res?.ok()).toBeTruthy();
 

@@ -2,41 +2,74 @@ name: Deploy to EC2
 
 on:
   push:
-    branches:
-      - main
+    branches: [production]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout (not strictly needed, but ok)
+        uses: actions/checkout@v4
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo "Host ec2-instance
-                HostName ${{ secrets.EC2_HOST }}
-                User ${{ secrets.EC2_USER }}
-                IdentityFile ~/.ssh/id_rsa
-                StrictHostKeyChecking no" > ~/.ssh/config
+          printf "Host ec2-instance\n  HostName %s\n  User %s\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no\n" "${{ secrets.EC2_HOST }}" "${{ secrets.EC2_USER }}" > ~/.ssh/config
 
       - name: Deploy application
+        env:
+          REPO_URL: git@github.com:OleksandrZhurba-san/final_project_ichgram.git
+          DEPLOY_DIR: ~/ichgram # change if you want another directory
+          BRANCH: production # deploy branch
         run: |
           ssh ec2-instance << 'EOF'
-          cd ~/final_project_ichgram/server
-          # Stash any local changes
-          git stash
-          # Reset to main branch
+          set -euo pipefail
+
+          # --- ensure deps (one-time; harmless if already installed)
+          if ! command -v docker >/dev/null; then
+            curl -fsSL https://get.docker.com | sh
+            sudo usermod -aG docker $USER || true
+          fi
+          if ! docker compose version >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y docker-compose-plugin
+          fi
+
+          REPO_URL="${REPO_URL}"
+          DEPLOY_DIR="${DEPLOY_DIR}"
+          BRANCH="${BRANCH}"
+
+          mkdir -p "$DEPLOY_DIR"
+          cd "$DEPLOY_DIR"
+
+          # clone if missing
+          if [ ! -d .git ]; then
+            git clone "$REPO_URL" .
+          fi
+
+          # fetch and checkout the right branch
           git fetch origin
-          git reset --hard origin/main
-          # Clean up any untracked files
+          # create local branch if missing, track remote
+          if ! git rev-parse --verify "$BRANCH" >/dev/null 2>&1; then
+            git checkout -b "$BRANCH" "origin/$BRANCH"
+          else
+            git checkout "$BRANCH"
+          fi
+          git reset --hard "origin/$BRANCH"
           git clean -fd
-          # Stop containers
-          sudo docker-compose down
-          # Rebuild and start containers
-          sudo docker-compose up -d --build
+
+          # optional: where your compose lives; adjust if it's in server/
+          COMPOSE_DIR="$DEPLOY_DIR"        # or: "$DEPLOY_DIR/server"
+          cd "$COMPOSE_DIR"
+
+          # stop old stack (ignore if none), rebuild & start
+          docker compose down || true
+          docker compose up -d --build
+
+          # show status
+          docker compose ps
           EOF
